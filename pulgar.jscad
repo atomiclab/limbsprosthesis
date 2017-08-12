@@ -24,59 +24,57 @@ function getParameterDefinitions() {
   ];
 }
  var r = [], y = [], t = [];
- var result,xbo
+ var result,xbo;
+ var alto=20;
+ var pinconector=2;
+ var tornilloconector=3;
 function main()
-{
-return plano();
+      {
+        util.init(CSG);
+        return pulgar();
+      }
 
-}
- function plano(){
+function plano(){
      var result=
         difference(
-                  union(
+              union(
+                  linear_extrude({height: alto/5},
+                      hull(
+                              circle({r: 14, center: true}).translate([-18,-11,0]), //circ grande
+                              circle({r: 8, center: true}).translate([-7,-9,0]), //circ chico
+                              square({size: [10,20], center: true}).translate([0, -10, 0]) //cuadrado
+                              )
+                      )
+          ),
 
-                        linear_extrude({height: 2},
+                cylinder({r:tornilloconector, h:alto, center: true}).translate([-18,-11,0]),
+                cylinder({r:pinconector, h:alto, center: true}).translate([-7,-5,0])); //pinconector
+                return result.mirroredY();
+    }
 
-                                        hull(
-                                                circle({r: 8, center: true}).translate([-15,10,0]),
-                                                circle({r: 8, center: true}).translate([-7,9,0]),
-                                                square({size: [10,10], center: true})
-                                                )
-                                        )
-                ),
+function body(params) {
 
-                cylinder({r:3, h:5, center: true}).translate([-15,10,0]),
-                cylinder({r:2, h:5, center: true}).translate([-5,12,0]));
+    var part =
+       hull(
+            square([20,20,alto]),
+            circle(10).translate([20,20,0]).scale([1.25,1,1])
+           );
 
+          part=linear_extrude({ height: 1 }, part);
 
 
-                return result;
-        }
+          var cbox = Boxes.Hollow(part,7).scale([1,1,alto]);
 
-        function body() {
-          var cyl = Parts.Cylinder(20, 20)
-          var cbox = Boxes.Hollow(cyl, 2/*,
-            function (box) {
-                    return box
-                      .fillet(2, 'z+')
-                      .fillet(2, 'z-');
-            }*/
-          );
-
-//  var box = Boxes.Rabett(cbox, 3, 0.5, 11, 5)
-
-  return cbox;
-
-        }
+          return union(cbox).fillet(2,'z-')
+          .fillet(2,'z+');
+    }
 
 function pulgar() {
-         var o = plano();
-
-        return o;
-
+    var dedo=body();
+    var planox=plano();
+    var resultado=
+    dedo.union(planox.snap(dedo, 'z', 'center+')
+        .rotateX(45)
+        .translate([0, 9, -2]));
+    return resultado;
 }
-
-
-
-
-   //
