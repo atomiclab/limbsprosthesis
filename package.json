@@ -1,0 +1,25 @@
+{
+  "name": "Test",
+  "version": "1.0.0",
+  "description": "test",
+  "main": "Test.jscad",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Gino Tubaro",
+  "license": "ISC",
+  "dependencies": {
+    "jscad-utils": "^3.1.2",
+    "lodash": "^4.17.4"
+  },
+  "devDependencies": {
+    "del": "^2.2.0",
+    "gulp": "^3.9.1",
+    "gulp-inject": "^4.2.0",
+    "gulp-jscad-files": "^2.0.0",
+    "gulp-load-plugins": "^1.2.0",
+    "gulp-merge": "^0.1.1",
+    "gulp-plumber": "^1.1.0",
+    "gulp-watch": "^4.3.5"
+  }
+}
