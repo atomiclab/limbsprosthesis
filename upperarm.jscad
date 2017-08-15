@@ -30,8 +30,74 @@ include('node_modules/jscad-utils/jscad-boxes.jscad');
 
 function main(params) {
   util.init(CSG);
+  var thing = thingTwisted(10, 30);
+  return thing;
 
 
+
+
+  function thingTwisted(radius, height) {
+
+  	var cag = CAG.fromPoints([
+  		[-radius, -radius, 0],
+  		[radius, -radius, 0],
+  		[radius, radius, 0]
+  	]).expand(1, CSG.defaultResolution2D);
+
+  	var flatBottom = CSG.Polygon.createFromPoints(
+  		cag.getOutlinePaths()[0].points
+  	);
+
+
+    var thing = flatBottom.solidFromSlices({
+  	numslices: height
+  	,callback: function(t) {
+  		var coef = 1+t;
+      var o = new Array();
+  		if (coef < 0.01) coef = 0.01;//must not collapse polygon
+  		var h = height * t;
+
+
+  o.push(circle({r:Math.sin(coef*4.8)+8, center:true}).translate([10,0,0]));
+  o.push(circle({r:Math.sin(coef*4.8)+8, center:true}).translate([-10,0,0]));
+
+  var cag =  hull(o).expand(2,CSG.defaultResolution2D);
+
+  var cage = CAG.circle({
+              center: [0,0],
+              radius: 3*Math.sin(coef*1.2),
+              resolution: 32
+         }).expand(2, CSG.defaultResolution2D);
+
+      var cags = CAG.fromPoints([
+  			[-radius, -radius, h],
+  			[radius, -radius, h],
+  	 		[radius , radius, h],
+  			[-radius, radius, h]
+  		]).expand(2, CSG.defaultResolution2D);
+
+  		return CSG.Polygon.createFromPoints(
+  			cag.getOutlinePaths()[0].points
+  		).translate([0, 0, h]);
+  	}
+    });
+var op=
+difference(
+  thing,
+  thing.scale([0.8,0.8,1.2]),
+  cube({size: [50, 100, 70], center: [true, false, true]}),
+  cylinder({r: 10, h: 50, center: [true, true, true]}).rotateX(90).translate([0, 0, 10]),
+  cube({size: [20, 20, 20], center: [true, true, true]})
+);
+     return op;
+  }
+
+
+
+
+
+
+/*  ANTIGUA VERSION DEL ANTE BRAZO- 95213 MS TO RENDER
   var curvedpath = [];
   var yua = 70; //largo
   var xbottomua=40; // bajo DIAMETRO
@@ -113,7 +179,7 @@ var esqueleto =
 -->
 
 return [union(esqueleto.rotateX(90).fillet(1,'z+'), cubo,mirrorcubo)];//.rotateX(90)
-
+*/
 
 
 }
