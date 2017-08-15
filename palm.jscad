@@ -100,21 +100,6 @@ var todo = union(g);
 
 }
 
-function test() {
-
-var radius=1;
-
-  var cag = CAG.fromPoints([
-  		[-radius, -radius, 0],
-  		[radius, -radius, 0],
-  		[radius, radius, 0]
-  	]).expand(2, CSG.defaultResolution2D);
-
-    var flatBottom = CSG.Polygon.createFromPoints(
-  		cag.getOutlinePaths()[0].points
-  	);
-  return cag;
-}
 
 function thingTwisted(radius, height) {
 
