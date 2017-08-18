@@ -85,9 +85,10 @@ var op=
 difference(
   thing,
   thing.scale([0.8,0.8,1.2]),
-  cube({size: [50, 100, 70], center: [true, false, true]}),
-  cylinder({r: 10, h: 50, center: [true, true, true]}).rotateX(90).translate([0, 0, 10]),
-  cube({size: [20, 20, 20], center: [true, true, true]})
+  cube({size: [50, 100, 70], center: [true, false, true]}), //corta a la mitad
+  cylinder({r: 12, h: 50, center: [true, true, true]}).rotateX(90).translate([0, 0, 10]), //cylinder que contornea la parte superior
+  cube({size: [24, 24, 22], center: [true, true, true]}), //cubo conectando a la parte superior
+  cylinder({r: 2, h: 100, center: [true, true, true]}).rotateY(90).translate([0, -4, 5]) // cylinder para los tornillos
 );
      return op;
   }
