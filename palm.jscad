@@ -70,7 +70,16 @@ return todo;
 
 
 }
+function cuerpito(h) {
+var o = new Array();
+  o.push(circle({r:10, center:true}).translate([10,0,0]));
+  o.push(circle({r:10, center:true}).translate([-10,0,0]));
+  o.push(square({size: [40,10], center: true}).translate([0, 5, 0]));
+  o.push(square({size:[40,40], center:true}).translate([0, 20, 0]))
+o = linear_extrude({ height: h }, hull(o));
 
+  return o.scale([0.8,0.8,2]);
+}
 
 
 function thingTwisted(radius, height) {
@@ -84,7 +93,7 @@ function thingTwisted(radius, height) {
 	var flatBottom = CSG.Polygon.createFromPoints(
 		cag.getOutlinePaths()[0].points
 	);
-
+ height=40;
 
   var thing = flatBottom.solidFromSlices({
 	numslices: height
@@ -92,12 +101,12 @@ function thingTwisted(radius, height) {
 		var coef = t;
     var o = new Array();
 		if (coef < 0.01) coef = 0.01;//must not collapse polygon
-		var h = height * t;
-
+		var h = height*t;
+  //  var y = -4(coef*1)+(coef*2) Hay que hacer una parabola para limitar el comienzo y final dl pulgar
 
 o.push(circle({r:10, center:true}).translate([10,0,0]));
 o.push(circle({r:10, center:true}).translate([-10,0,0]));
-o.push(circle({r:Math.sin(coef*2)*10, center:true}).translate([20,9,0]));
+if ((h>=3)&&(h<=50))o.push(circle({r:Math.sin(coef*3)*6, center:true}).translate([18,10,0]));
 o.push(square({size: [40,10], center: true}).translate([0, 5, 0]));
 
 
@@ -122,5 +131,5 @@ var cage = CAG.circle({
 		).translate([0, 0, h]);
 	}
   });
-   return union(thing,conector().mirroredZ());
+   return    difference(union(thing,conector().mirroredZ()),cuerpito(20));
 }
