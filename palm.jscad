@@ -71,34 +71,6 @@ return todo;
 
 }
 
-function cuerpo() {
-
-  var o = new Array();
-  var g = new Array();
-  var e = new Array();
-    var largo=20;
-    var last=1;
-    var long=0;
-
-for (var i = 0; i < largo; i=i+0.25) {
-
-  o.push(circle({r:10, center:true}).translate([10,0,0]));
-  o.push(circle({r:10, center:true}).translate([-10,0,0]));
-  o.push(circle({r: 0.5*Math.sign(i) * Math.sign( Math.abs(i)/4-2)*(1-Math.pow(Math.abs(Math.abs(i)/2-1), 1.5) )+0.5, center:true}).translate([15,2,0]));
-  o.push(square({size: [40,10], center: true}).translate([0, 5, 0]));
-
-  g.push(linear_extrude({ height: 1 }, hull(o)).translate([0, 0, i]));
-o=[];
-
-}
-var todo = union(g);
-          var cbox = difference(todo,todo.scale([0.9,0.9,1.2]));
-
-  return union(cbox);
-
-
-
-}
 
 
 function thingTwisted(radius, height) {
@@ -117,7 +89,7 @@ function thingTwisted(radius, height) {
   var thing = flatBottom.solidFromSlices({
 	numslices: height
 	,callback: function(t) {
-		var coef = 1+t;
+		var coef = t;
     var o = new Array();
 		if (coef < 0.01) coef = 0.01;//must not collapse polygon
 		var h = height * t;
@@ -125,28 +97,30 @@ function thingTwisted(radius, height) {
 
 o.push(circle({r:10, center:true}).translate([10,0,0]));
 o.push(circle({r:10, center:true}).translate([-10,0,0]));
-o.push(circle({r:Math.sin(coef*4.8)+8, center:true}).translate([13,9,0]));
+o.push(circle({r:Math.sin(coef*2)*10, center:true}).translate([20,9,0]));
 o.push(square({size: [40,10], center: true}).translate([0, 5, 0]));
 
-var cag =  hull(o).expand(2,CSG.defaultResolution2D);
+
+
+cag =  hull(o); //.expand(1,CSG.defaultResolution2D)
 
 var cage = CAG.circle({
             center: [0,0],
             radius: 3*Math.sin(coef*1.2),
             resolution: 32
-       }).expand(2, CSG.defaultResolution2D);
+       }).expand(1, CSG.defaultResolution2D);
 
     var cags = CAG.fromPoints([
 			[-radius, -radius, h],
 			[radius, -radius, h],
 	 		[radius , radius, h],
 			[-radius, radius, h]
-		]).expand(2, CSG.defaultResolution2D);
+		]).expand(1, CSG.defaultResolution2D);
 
 		return CSG.Polygon.createFromPoints(
 			cag.getOutlinePaths()[0].points
 		).translate([0, 0, h]);
 	}
   });
-   return thing;
+   return union(thing,conector().mirroredZ());
 }
