@@ -35,7 +35,7 @@ function main()
         return thing;
       }
 
-function conector() {
+function slider() {
 
     var o = new Array();
     var g = new Array();
@@ -70,6 +70,21 @@ return todo;
 
 
 }
+function conectores(alto) {
+  var o = new Array();
+  o.push(cube({size: [100, 2, alto/3], center: [true, true, true]}).translate([0, 2, alto/3]));
+  o.push(cube({size: [100, 2, alto/3], center: [true, true, true]}).translate([0, -2, alto/3]));
+  o.push(cylinder({r: 2.75, h: alto, center: [true, true, true]}).rotateX(90).rotateZ(90).translate([0, 5, alto-5]));
+
+
+  return union(o);
+}
+function contornos(alto) {
+  var o = new Array();
+  o.push(cylinder({r: 10, h: alto, center: [true, true, true]}).rotateX(90).rotateZ(90).translate([0, -10, alto]));
+  o.push(cylinder({r: 15, h: alto, center: [true, true, true]}).rotateX(90).translate([0, -10, alto-5]));
+  return union(o);
+}
 function cuerpito(h) {
 var o = new Array();
   o.push(circle({r:10, center:true}).translate([10,0,0]));
@@ -93,7 +108,7 @@ function thingTwisted(radius, height) {
 	var flatBottom = CSG.Polygon.createFromPoints(
 		cag.getOutlinePaths()[0].points
 	);
- height=40;
+ height=50;
 
   var thing = flatBottom.solidFromSlices({
 	numslices: height
@@ -102,11 +117,15 @@ function thingTwisted(radius, height) {
     var o = new Array();
 		if (coef < 0.01) coef = 0.01;//must not collapse polygon
 		var h = height*t;
-  //  var y = -4(coef*1)+(coef*2) Hay que hacer una parabola para limitar el comienzo y final dl pulgar
-
-o.push(circle({r:10, center:true}).translate([10,0,0]));
-o.push(circle({r:10, center:true}).translate([-10,0,0]));
-if ((h>=3)&&(h<=50))o.push(circle({r:Math.sin(coef*3)*6, center:true}).translate([18,10,0]));
+    var y = 0;
+    //var e = 1/(Math.sqrt(1+(Math.pow(coef*0.01,3)))); //Hay que hacer una parabola para limitar el comienzo y final dl pulgar
+    var b = 10+Math.sin(coef*3);
+o.push(circle({r:b, center:true}).translate([10,0,0]));
+o.push(circle({r:b, center:true}).translate([-10,0,0]));
+if ((h>=height/6)&&(h<=(height*2/3))){
+y=(h-height/6)*(h-(height*2/3))*0.6+2;
+o.push(circle({r:y/10, center:true}).translate([17,9,0]));
+};
 o.push(square({size: [40,10], center: true}).translate([0, 5, 0]));
 
 
@@ -131,5 +150,15 @@ var cage = CAG.circle({
 		).translate([0, 0, h]);
 	}
   });
-   return    difference(union(thing,conector().mirroredZ()),cuerpito(20));
+
+  var palma=
+  difference(
+    union(thing,slider().mirroredZ()).fillet(3,'z+'),
+    cuerpito(height),
+    conectores(height),
+    contornos(height)
+
+  );
+
+   return palma;
 }
