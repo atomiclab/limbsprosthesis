@@ -70,6 +70,19 @@ return todo;
 
 
 }
+function bajorelieve(height) {
+
+
+  var h = hull(
+    square({size: [60,1], center: true}).translate([0, height,0 ]),
+    circle({r: 20, center: true}).translate([0,height/6,0])
+  );
+
+    var tapa = linear_extrude({ height: 1 }, h);
+
+    return tapa.rotateX(90);
+
+}
 function conectores(alto) {
   var o = new Array();
   o.push(cube({size: [100, 2, alto/3], center: [true, true, true]}).translate([0, 2, alto/3]));
@@ -158,7 +171,12 @@ var cage = CAG.circle({
     conectores(height),
     contornos(height)
 
+
   );
+
+//  palma= palma.snap(bajorelieve(height), 'x', 'center-');
+  todo= palma.subtract(bajorelieve(15).snap(palma, 'x', 'inside-').translate([0, -1, 0]));
+
 
    return palma;
 }
