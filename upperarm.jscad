@@ -104,11 +104,12 @@ difference(
   cylinder({r: 14, h: 50, center: [true, true, true]}).rotateX(90).translate([0, 0, 10]), //cylinder que contornea la parte superior
   //cube({size: [24, 24, 22], center: [true, true, true]}), //cubo conectando a la parte superior
   //cylinder({r: 2, h: 100, center: [true, true, true]}).rotateY(90).translate([0, 2, 4]), // cylinder para los tornillos
-  cylinder({r: 12, h: 100, center: [true, true, true]}).rotateY(90).translate([0, -12,0]) // contornosuperior
+  cylinder({r: 12, h: 100, center: [true, true, true]}).rotateY(90).translate([0, -12,0]), // contornosuperior
+  cylinder({r: 14, h: 100, center: [true, true, true]}).rotateY(90).translate([0, 8,height]) // contornosuperior
 
 );
 
-     return op.fillet(1,'z-');
+     return op.fillet(1.5,'z+');
   }
 
 
