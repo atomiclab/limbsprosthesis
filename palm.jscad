@@ -2,9 +2,9 @@
 // author     : Gino Tubaro
 // license    : MIT License
 // description: just a thumb
-// file       : pulgar.jscad
+// file       : palma.jscad
 //!OpenSCAD
-//Hay que corregir los agujeros en el agulo
+//Hay que parametrizar
 
 include('lodash.js');
 
@@ -70,6 +70,8 @@ return todo;
 
 
 }
+
+
 function bajorelieve(height,prof) {
 
   var h = hull(
@@ -103,7 +105,7 @@ var o = new Array();
   o.push(square({size:[40,40], center:true}).translate([0, 20, 0]))
 o = linear_extrude({ height: h }, hull(o));
 
-  return o.scale([0.8,0.8,2]);
+  return o.scale([0.75,0.7,2]);
 }
 
 
@@ -170,10 +172,31 @@ var cage = CAG.circle({
 
 
   );
+  function oppulgar() {
+    var cubo = new Array();
+
+    cubo.push(cube({size: [3.5, 10, 28], center: [true, false, false]})
+          .snap(palma,'y','outside-')
+          .translate([18, -8, 0])
+        );
+    cubo.push(
+      cylinder({r: 2, h: 100, center: [true, true, true]})
+      .snap(palma,'y','outside-')
+      .rotateY(90)
+      .translate([0, -7, height/2.5])
+    );
+    return union(cubo);
+  }
+
 
 //  palma= palma.snap(bajorelieve(height), 'x', 'center-');
-  todo= bajorelieve(height,4).snap(palma, 'y', 'outside+').translate([0, 1.5, height/3]);
+    todo= bajorelieve(height,8)
+            .snap(palma, 'y', 'outside+')
+            .translate([0, 3, height/3]);
 
 
-   return difference(palma,todo);
+
+todo=difference(palma,todo,oppulgar());
+   return todo;
+
 }
