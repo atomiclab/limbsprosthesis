@@ -6,7 +6,13 @@
 
 // Curvatura dada por elipsoide
 
-//
+include('lodash.js');
+
+include("node_modules/jscad-utils/jscad-utils.jscad");
+include("node_modules/jscad-utils/jscad-utils-color.jscad");
+
+include('node_modules/jscad-utils/jscad-utils-parts.jscad');
+include('node_modules/jscad-utils/jscad-boxes.jscad');
 
 function getParameterDefinitions() {
   return [
@@ -19,15 +25,20 @@ function getParameterDefinitions() {
  var result,xbottom,cono, ext, int, pata;
 
 function main() {
+    util.init(CSG);
 var ancho = 40;
-var alt = 6;
+var alt = 7;
+var array = conectores(ancho);
   var arco =
         union(
-          conectores(),
+          array[0],
+          array[1],
           ext(ancho,alt)
             //int(ancho-3).translate([0, 0, 1.5])
           );
-return  arco;
+return  arco
+      .fillet(0.5,'z-')
+      .fillet(0.5,'z+');
 }
 
 
@@ -83,8 +94,8 @@ return  arco;
 
 
       var o = new Array();
-  o.push(
-    circle({r: y, center: true}).scale([0.4,1,1]).translate([x1,0,0])
+    o.push(
+    circle({r: y, center: true}).scale([0.5,1,1]).translate([x1,0,0])
   //  circle({r: 1, center: true}).translate([x2,0,0])
          );
 
@@ -104,9 +115,6 @@ var all = CSG.Polygon.createFromPoints(
      return thing;
 
 }
-
-
-
 
 function calculate(x1,x2,y,yaux)
 {
@@ -148,12 +156,26 @@ if (yans<0) {sgnb=" "};
 if (zans<0) {sgnc=" "};
 xans = xans;
 yans = sgnb + yans;
-var spacer="          ";
-var sgnb=" +";
-var sgnc=" +";
-var suprscrpt="²";
+
 return [xans,yans,zans];
 }
-function conectores() {
-    return cube({size: [10, 9.8, 1], center: [true, true, false]}).translate([-5, 0, 0]);
+
+
+function conectores(alto) {
+
+  var bajo = hull(
+      square({size: [4,9.5], center: true}),
+      circle(1).translate([-2,5,0]),
+      circle(1).translate([-2,-6.5,0])
+    );
+  bajo= linear_extrude({ height: 1}, bajo).translate([-1.5, 0, alto-1.5]);
+
+  var superior = hull(
+      square({size: [4,9.5], center: true}),
+      circle(1).translate([-2,5,0]),
+      circle(1).translate([-2,-6.5,0])
+    );
+  superior= linear_extrude({ height: 1}, superior).translate([-1.5, 0, 0]);
+
+    return [bajo,superior];
 }
