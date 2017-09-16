@@ -137,19 +137,19 @@ function calculate(x1,x2,y,yaux)
     k = 1;
     l = yaux; //y3
 
-<!--EVALUATING THE DELTA DETERMINANT -->
+<!--Diferenciales -->
 delta = (a*f*k)+(b*g*i)+(c*e*j)-(c*f*i)-(a*g*j)-(b*e*k);
 //document.output.x.value = delta;
 
-<!--EVALUATING THE X NUMERATOR & ANSWER -->
+<!--Valor de A-->
 xnum = eval((d*f*k)+(b*g*l)+(c*h*j)-(c*f*l)-(d*g*j)-(b*h*k));
 xans =eval(xnum/delta);
 
-<!--EVALUATING THE Y NUMERATOR & ANSWER -->
+<!--Valor de B -->
 ynum = eval((a*h*k)+(d*g*i)+(c*e*l)-(c*h*i)-(a*g*l)-(d*e*k));
 yans =eval(ynum/delta);
 
-<!--EVALUATING THE Z NUMERATOR & ANSWER -->
+<!--Valor de C-->
 znum = eval((a*f*l)+(b*h*i)+(d*e*j)-(d*f*i)-(a*h*j)-(b*e*l));
 zans =eval(znum/delta);
 if (yans<0) {sgnb=" "};
@@ -168,14 +168,22 @@ function conectores(alto) {
       circle(1).translate([-2,5,0]),
       circle(1).translate([-2,-6.5,0])
     );
-  bajo= linear_extrude({ height: 1}, bajo).translate([-1.5, 0, alto-1.5]);
+  bajo= linear_extrude({ height: 1}, bajo).translate([-1.5, 0, 0]);
+bajo=union(bajo,
+   cylinder({r: 1, h: 2,round:true, center: [true, true, false]}).translate([-2.4,-5.8,1]),
+   cylinder({r: 1, h: 3,round:true, center: [true, true, false]}).translate([-2.4,6,1])
 
+ )
   var superior = hull(
       square({size: [4,9.5], center: true}),
       circle(1).translate([-2,5,0]),
       circle(1).translate([-2,-6.5,0])
     );
-  superior= linear_extrude({ height: 1}, superior).translate([-1.5, 0, 0]);
+  superior= linear_extrude({ height: 1}, superior).translate([-1.5, 0, alto-1.5]);
+  superior=union(superior,
+     cylinder({r: 1, h: 2,round:true, center: [true, true, false]}).translate([-2.4,-5.8,alto-3.5]),
+     cylinder({r: 1, h: 3,round:true, center: [true, true, false]}).translate([-2.4,6,alto-4.5])
 
+   )
     return [bajo,superior];
 }
