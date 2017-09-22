@@ -14,6 +14,7 @@ include("node_modules/jscad-utils/jscad-utils-color.jscad");
 include('node_modules/jscad-utils/jscad-utils-parts.jscad');
 include('node_modules/jscad-utils/jscad-boxes.jscad');
 
+include('conectores.jscad');
 function getParameterDefinitions() {
   return [
     { name: 'x', type: 'float', initial: 80, caption: "x:" },
@@ -26,8 +27,8 @@ function getParameterDefinitions() {
 
 function main() {
     util.init(CSG);
-var ancho = 40;
-var alt = 7;
+var ancho = 50;
+var alt = 5;
 var array = conectores(ancho);
   var arco =
         union(
@@ -35,10 +36,17 @@ var array = conectores(ancho);
           array[1],
           ext(ancho,alt)
             //int(ancho-3).translate([0, 0, 1.5])
-          );
+          ).fillet(0.5,'z-')
+          .fillet(0.5,'z+');
+arco=
+    union(pin(10,3,4,1,10)
+          .rotateX(90)
+          .rotateZ(0)
+          .snap(arco,'z','outside+'),arco);
+
+
 return  arco
-      .fillet(0.5,'z-')
-      .fillet(0.5,'z+');
+
 }
 
 
@@ -83,7 +91,6 @@ return  arco
       }
     //  var x = -0.16*Math.pow(t,2)+dist/2;
     //  var y = 0.16*Math.pow(t,2)-dist/2;
-
 
 
       var coef = t;
@@ -164,25 +171,27 @@ return [xans,yans,zans];
 function conectores(alto) {
 
   var bajo = hull(
-      square({size: [4,9.5], center: true}),
+      square({size: [4.3,8.5], center: true}).translate([0.8, 0, 0]),
       circle(1).translate([-2,5,0]),
       circle(1).translate([-2,-6.5,0])
+
     );
-  bajo= linear_extrude({ height: 1}, bajo).translate([-1.5, 0, 0]);
+  bajo= linear_extrude({ height: 3}, bajo).translate([-1.5, 0, 0]);
 bajo=union(bajo,
-   cylinder({r: 1, h: 2,round:true, center: [true, true, false]}).translate([-2.4,-5.8,1]),
-   cylinder({r: 1, h: 3,round:true, center: [true, true, false]}).translate([-2.4,6,1])
+   cylinder({r: 1, h: 3,round:true, center: [true, true, false]}).translate([-2.4,-5.8,1]),
+   cylinder({r: 1, h: 4,round:true, center: [true, true, false]}).translate([-2.4,6,1])
 
  )
+
   var superior = hull(
-      square({size: [4,9.5], center: true}),
+      square({size: [4.3,8.5], center: true}).translate([0.8, 0, 0]),
       circle(1).translate([-2,5,0]),
       circle(1).translate([-2,-6.5,0])
     );
-  superior= linear_extrude({ height: 1}, superior).translate([-1.5, 0, alto-1.5]);
+  superior= linear_extrude({ height: 3}, superior).translate([-1.5, 0, alto-3.5]);
   superior=union(superior,
-     cylinder({r: 1, h: 2,round:true, center: [true, true, false]}).translate([-2.4,-5.8,alto-3.5]),
-     cylinder({r: 1, h: 3,round:true, center: [true, true, false]}).translate([-2.4,6,alto-4.5])
+     cylinder({r: 1, h: 3,round:true, center: [true, true, false]}).translate([-2.4,-5.8,alto-4.5]),
+     cylinder({r: 1, h: 4,round:true, center: [true, true, false]}).translate([-2.4,6,alto-5.5])
 
    )
     return [bajo,superior];
