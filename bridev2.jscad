@@ -39,13 +39,20 @@ var array = conectores(ancho);
           ).fillet(0.5,'z-')
           .fillet(0.5,'z+');
 arco=
-    union(pin(10,3,4,1,10)
+    union(
+      pin(10,2.5,4,1,10)
           .rotateX(90)
-          .rotateZ(0)
-          .snap(arco,'z','outside+'),arco);
+          .rotateZ(100)
+          .snap(arco,'z','outside+')
+          .translate([1.5, -8, 1]),
+      arco
+    );
 
 
 return  arco
+          .rotateY(270)
+          .snap(cube(1),'z','outside-')
+          .translate([ancho/2, 0, 0]);
 
 }
 
@@ -173,8 +180,11 @@ function conectores(alto) {
   var bajo = hull(
       square({size: [4.3,8.5], center: true}).translate([0.8, 0, 0]),
       circle(1).translate([-2,5,0]),
-      circle(1).translate([-2,-6.5,0])
 
+hull(
+      circle(1).translate([-2,-6.5,0]),
+      circle(2).translate([3, -11, 0])
+)
     );
   bajo= linear_extrude({ height: 3}, bajo).translate([-1.5, 0, 0]);
 bajo=union(bajo,
