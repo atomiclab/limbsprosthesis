@@ -6,29 +6,10 @@
 
 // Curvatura dada por elipsoide
 
-include('lodash.js');
 
-include("node_modules/jscad-utils/jscad-utils.jscad");
-include("node_modules/jscad-utils/jscad-utils-color.jscad");
+function x2(ancho, alt) {
 
-include('node_modules/jscad-utils/jscad-utils-parts.jscad');
-include('node_modules/jscad-utils/jscad-boxes.jscad');
 
-include('conectores.jscad');
-function getParameterDefinitions() {
-  return [
-    { name: 'x', type: 'float', initial: 80, caption: "x:" },
-    { name: 'y', type: 'float', initial: 30, caption: "y:" },
-    { name: 'z', type: 'float', initial: 8, caption: "z:" },
-    ];
-}
- var r = [], y = [], t = [];
- var result,xbottom,cono, ext, int, pata;
-
-function main() {
-    util.init(CSG);
-var ancho = 50;
-var alt = 5;
 var array = conectores(ancho);
   var arco =
         union(
