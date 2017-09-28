@@ -26,25 +26,9 @@ function pinhole({h=10, r=4, lh=3, lt=1, t=0.3, tight=true} = {}) {
   );
   // widen the cylinder slightly
   // cylinder(h=h+0.2, r=r+(t-0.2/2));
-  if (tight == false) {
-    ret = ret.union(cylinder({h:h+0.2, r:r+(t/2)+0.25}));
-  }
+
   return ret;
 }
-
-// h = shaft height
-// r = shaft radius
-// lh = lip height
-// lt = lip thickness
-// side = set to true if you want it printed horizontally
-function pin({h=10, r=4, lh=3, lt=1, side=false} = {}) {
-  if (side) {
-    return pin_horizontal(h, r, lh, lt);
-  } else {
-    return pin_vertical(h, r, lh, lt);
-  }
-}
-
 
 // bh = base_height
 // br = base_radius
@@ -69,7 +53,7 @@ function pinpeg({h=20, r=4, lh=3, lt=1} = {}) {
 // lh = lip height
 // lt = lip thickness
 
-function pin_vertical({h=10, r=4, lh=3, lt=1} = {}) {
+function pin_vertical(h, r, lh, lt) {
   return difference(
     pin_solid(h, r, lh, lt),
     // center cut
@@ -86,12 +70,12 @@ function pin_vertical({h=10, r=4, lh=3, lt=1} = {}) {
 // r = shaft radius
 // lh = lip height
 // lt = lip thickness
-function pin_horizontal({h=10, r=4, lh=3, lt=1} = {}) {
-  return pin_vertical(h, r, lh, lt).rotate([90, 0, 0]).translate([0, h/2, r*1.125-lt]);
+function pin_horizontal(h, r, lh, lt) {
+  return pin_vertical(h, r, lh, lt).rotateX(90).translate([0, h/2, r*1.125-lt]);
 }
 
 // this is mainly to make the pinhole module easier
-function pin_solid({h=10, r=4, lh=3, lt=1} = {}) {
+function pin_solid(h, r, lh, lt) {
   return union(
     // shaft
     cylinder({h:h-lh, r:r, fn:30}),
