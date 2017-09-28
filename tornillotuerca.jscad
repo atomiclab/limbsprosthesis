@@ -1,9 +1,8 @@
-function main() {
-  var alto = 15;
-  var ancho = 5;
-return  tornillotuerca(alto,ancho);
-
-}
+//function main() {
+// var alto = 30;
+// var ancho = 5;
+//return  tornillotuerca(alto,ancho)[1];
+//}
 
   function tornillotuerca(alto,ancho) {
 
@@ -18,16 +17,17 @@ return  tornillotuerca(alto,ancho);
   		cag.getOutlinePaths()[0].points
   	);
 
-
+//20-4 Relacion Alto con dientes de tuerca variable numslices
+//40-8
     var tornillo = flatBottom.solidFromSlices({
-  	numslices: alto
+  	numslices: alto*3
   	,callback: function(t,k) {
       k=k+1;
   		var coef = t;
       var o = new Array();
   		if (coef < 0.01) coef = 0.01;//must not collapse polygon
   		var h = alto*t;
-      var i = coef+1;
+    //  var i = coef+1;
       var y = Math.sin(k+t);
       var x = Math.cos(k+t);
   o.push(
@@ -50,6 +50,6 @@ var tuerca=
       difference(cylinder({r: ancho+2, h: alto, center: [true, true, false]}),
       tornillo
     )
-     return union(tuerca.scale(1.05),tornillo.translate([3*ancho, 0, 0]));
+     return [tuerca.scale(1.05),tornillo];
 
 }
