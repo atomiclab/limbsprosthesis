@@ -1,31 +1,23 @@
-// title      : Generador de barras laterales
+// title      : Barras laterales
 // author     : Gino Tubaro
 // license    : MIT License
-// description: the two sliders parametrics
+// description: General assembly document
 // file       : barras.jscad
-//Hay que poner los pines
-//Toma
-//Slider
-// X = Pos inicial,  Y = Pos final, Z = Apertura de curva
-//Devuelve
-//Objeto
-//
-//
+//  Functions:
+//      Parts:
+//                  slider(h, r, lh, lt) Devuelve pin con tapa
+//                  pin(h, r, lh, lt, side) Devuelve pin sin tapa
+//                  pin_doble(h, r, lh, lt, gap)
+//      Params:
+//                  h:altura, r: radio, lh: lipheight, lt: lipthickness
+//                  bh: base_height  br: base_radius, gap: distancia entre pines
 
 
+function slider(x,y,p) {
 
- var r = [], y = [], t = [];
- var result,xbottom,cono, ext, int, pata, l;
-
-
-function main() {
-  return sider(0,10,1); // X = Pos inicial,  Y = Pos final, Z = Apertura de curva
-}
-
-function sider(x,y,p) {
-
-    var vals = calculate(0,y,2,0);
+    var vals = calculate(0,y,p,0);
 var g = new Array();
+
 for (var i = 0; i < (y-x+1); i++) {
 
   var x =  (vals[0]*Math.pow(i,2)) + (vals[1]*i) + vals[2];
@@ -35,10 +27,13 @@ for (var i = 0; i < (y-x+1); i++) {
 
 
 }
+var r=1;h=5;
 x= difference(
-linear_extrude({ height: 5 }, chain_hull(g)),
-cylinder({r: 1, h: 6, center: [true, true, false]}).translate([0, y, 0]), //PONER PINES.
-cylinder({r: 1, h: 6, center: [true, true, false]})
+linear_extrude({ height: h }, chain_hull(g)),
+cylinder({r: r, h: h, center: [true, true, false]}).translate([0, y, 0]), //PONER PINES.
+cylinder({r: r, h: h, center: [true, true, false]}),
+pinhole(h,r,3,1,0.3),
+pinhole(h,r,3,1,0.3).translate([0,y,0])
 
 )
 return x;
