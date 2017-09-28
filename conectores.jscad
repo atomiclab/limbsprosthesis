@@ -1,15 +1,19 @@
-  // title      : connectors
-  // author     : Gino Tubaro
-  // license    : MIT License
-  //            conector(x,y,dual,baseh);
-  //            x: largo longitudinal, y: ancho radial, dual Boolean (doble o simple)
-  //            baseh: largo longitudinal de base //WARNING: sumar x+baseh
-  // file       : conectores.jscad
-  // file       : conectores.jscad
-  //!OpenSCAD
+// title      : Conectores parametricos
+// author     : Gino Tubaro
+// license    : MIT License
+// description: General assembly document
+// file       : conectores.jscad
+//  Functions:
+//      Parts:            conectores.jscad
+//                  pin_tapa(h, r, lh, lt) Devuelve pin con tapa
+//                  pin(h, r, lh, lt, side) Devuelve pin sin tapa
+//                  pin_doble(h, r, lh, lt, gap)
+//      Params:
+//                  h:altura, r: radio, lh: lipheight, lt: lipthickness
+//                  bh: base_height  br: base_radius, gap: distancia entre pines
 
 
-
+//Inicializar el archivo de forma unitaria.
 //function main() {
 //      util.init(CSG);
 //      return [pin_doble(20,3,4,1,10),pin_doble(20,3,4,1,5),pin_tapa(20,3,4,1,10),pin(20,3,4,1,10)];
