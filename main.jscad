@@ -1,18 +1,33 @@
-// title      : assembly
+// title      : Main - Hand Assembler.
 // author     : Gino Tubaro
 // license    : MIT License
 // description: General assembly document
-//            Listed files are: conectores.jscad
-//      Parts:
-//                    UpperArm - Thumb short conector
-//                    UpperArm - Palm connectorx2
-//                    UpperArm - Finger Conector
+// file       : main.jscad
+// Current files are:
+//-------------------> conectores.jscad
+//-------------------> barras.jscad
+//-------------------> cover.jscad
+//-------------------> tornillotuerca.jscad
+//-------------------> barras.jscad
+//-------------------> barras.jscad
+//-------------------> barras.jscad
+// Functions:
+//      Parts:            conectores.jscad
+//                  pin_tapa(h, r, lh, lt) Devuelve pin con tapa
+//                  pin(h, r, lh, lt, side) Devuelve pin sin tapa
+//                  pin_doble(h, r, lh, lt, gap)
 //      Params:
-//            conector(x,y,dual,baseh);
-//            x: largo longitudinal, y: ancho radial, dual Boolean (doble o simple)
-//            baseh: largo longitudinal de base //WARNING: sumar x+baseh
-// file       : conectores.jscad
-//!OpenSCAD
+//                  h:altura, r: radio, lh: lipheight, lt: lipthickness
+//                  bh: base_height  br: base_radius, gap: distancia entre pines
+//
+// Functions:
+//      Parts:            barras.jscad
+//                  slider(x,y,z) devuelve barra
+//      Params:
+//                  x:pos inicial, y: pos final, z: curvatura (0= barra derecha)
+//
+
+
 
 // To Implement:
 //INCHS - MM -> util.INCH(x)
@@ -31,9 +46,15 @@ include ("esqueleto.jscad");
 include ("conectores.jscad");
 include ("barras.jscad");
 include ("formulas.jscad");
-include ("upperarm.jscad");
-include ("pulgar.jscad");
 include ("cover.jscad");
+include ("tornillotuerca.jscad");
+include ("pins.jscad");
+include ("bridev2.jscad");
+//include ("upperarm.jscad");
+//include ("pulgar.jscad");
+
+//include ("lib0.jscad");
+//include ("bridge.jscad");
 function getParameterDefinitions() {
     return [
 /* PARAMETROS DE PIEZAS
@@ -206,14 +227,17 @@ function main(params) {
                 return[
 
  // Crear esqueleto del muñon
+ //AtomicLabCover(10),
+//AtomicLabCover(30,2)
+//slider(0,30,2)
+//    x2 (50,4)
 
-                    stumpE(params.xtop,params.x,params.ypalm,params.zpalm),
-                    wristE(params.x,params.zpalm),
-                    UpperArmE(params.x,params.xbottomua,params.yua,params.zua),
+                  //  stumpE(params.xtop,params.x,params.ypalm,params.zpalm),
+                  //  wristE(params.x,params.zpalm),
+                  //  UpperArmE(params.x,params.xbottomua,params.yua,params.zua),
 
 //Crear elementos de la protesis
 
-pulgar()
 
 
                 ];
