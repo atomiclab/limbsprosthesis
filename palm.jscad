@@ -14,15 +14,9 @@ include("node_modules/jscad-utils/jscad-utils-color.jscad");
 include('node_modules/jscad-utils/jscad-utils-parts.jscad');
 include('node_modules/jscad-utils/jscad-boxes.jscad');
 
-function getParameterDefinitions() {
-  return [
-    { name: 'largodedos', type: 'float', initial: 5, caption: "x:" },
-    { name: 'y', type: 'float', initial: 30, caption: "y:" },
-    { name: 'z', type: 'float', initial: 8, caption: "z:" },
-    { name: 'altopata', type: 'float', initial: 20, caption: "altopata" },
-    { name: 'colors', type: 'choice', caption: "Colores", values:["red", "blue", "black"], captions:["Rojo", "Azul", "Negro"], initial: "Rojo" },
-  ];
-}
+include("tornillotuerca.jscad");
+
+
  var r = [], y = [], t = [];
  var result,xbo;
  var alto=20;
@@ -79,7 +73,9 @@ function bajorelieve(height,prof) {
     circle({r: 15, center: true}).translate([0,height/6,0])
   );
     var tapa = linear_extrude({ height: prof }, h);
+
     return tapa.rotateX(90);
+
 }
 
 function conectores(alto) {
@@ -179,12 +175,7 @@ var cage = CAG.circle({
           .snap(palma,'y','outside-')
           .translate([18, -8, 0])
         );
-    cubo.push(
-      cylinder({r: 2, h: 100, center: [true, true, true]})
-      .snap(palma,'y','outside-')
-      .rotateY(90)
-      .translate([0, -7, height/2.5])
-    );
+
     return union(cubo);
   }
 
@@ -197,6 +188,36 @@ var cage = CAG.circle({
 
 
 todo=difference(palma,todo,oppulgar());
+
+todo=
+  union(
+      difference(
+        todo,
+        cylinder({r: 3, h: 5, center: [true, true, true]})
+          .rotateY(90)
+          .rotateZ(90)
+          .snap(todo,'y','outside+')
+          .translate([0, 4, height/2.5]),
+        cylinder({r: 2.75, h: 60, center: [true, true, true]})
+            .snap(palma,'y','outside-')
+            .rotateY(90)
+            .translate([0, -8, height/2.5]),
+        cube({size: [10, 10, 100], center: [true, false, false]}) //Cubo que "limpia" el borde derecho
+            .translate([-20, 10, 0])
+
+        ),
+        tornillotuerca(4,2.5)[0]
+              .rotateX(90)
+              .snap(todo,'y','outside+')
+              .translate([0, 4, height/2.5]),
+
+        tornillotuerca(5,1.75)[0]
+              .rotateY(90)
+              .snap(palma,'y','outside-')
+              .snap(palma,'x','outside-')
+              .translate([-6.25, -9, height/2.5])
+
+      )
    return todo;
 
 }
