@@ -19,14 +19,16 @@ include("tornillotuerca.jscad");
 
  var r = [], y = [], t = [];
  var result,xbo;
- var alto=20;
+ var long=50;
+ var alto=10;
+ var muneca=15;
  var pinconector=2;
  var tornilloconector=3;
 function main()
       {
         util.init(CSG);
-        var thing = thingTwisted(10, 30);
-        return thing;
+        var palma = palmagenerator(alto, long, muneca);
+        return palma;
       }
 
 function slider() {
@@ -40,8 +42,8 @@ function slider() {
 
 
 
-  o.push(circle({r:10, center:true}).translate([10,0,0]));
-  o.push(circle({r:10, center:true}).translate([-10,0,0]));
+  o.push(circle({r:10, center:true}).translate([alto,0,0]));
+  o.push(circle({r:10, center:true}).translate([-alto,0,0]));
   o.push(square({size: [40,10], center: true}).translate([0, 5, 0]));
 
   g.push(linear_extrude({ height: 5 }, hull(o)).translate([0, 0, 0]));
@@ -93,10 +95,10 @@ function contornos(alto) {
   o.push(cylinder({r: 15, h: alto, center: [true, true, true]}).rotateX(90).translate([0, -10, alto-5]));
   return union(o);
 }
-function cuerpito(h) {
+function cuerpito(h,ancho) {
 var o = new Array();
-  o.push(circle({r:10, center:true}).translate([10,0,0]));
-  o.push(circle({r:10, center:true}).translate([-10,0,0]));
+  o.push(circle({r:10, center:true}).translate([ancho,0,0]));
+  o.push(circle({r:10, center:true}).translate([-ancho,0,0]));
   o.push(square({size: [40,10], center: true}).translate([0, 5, 0]));
   o.push(square({size:[40,40], center:true}).translate([0, 20, 0]))
 o = linear_extrude({ height: h }, hull(o));
@@ -105,18 +107,18 @@ o = linear_extrude({ height: h }, hull(o));
 }
 
 
-function thingTwisted(radius, height) {
+function palmagenerator(ancho, height,muneca) {
 
 	var cag = CAG.fromPoints([
-		[-radius, -radius, 0],
-		[radius, -radius, 0],
-		[radius, radius, 0]
+		[-1, -1, 0],
+		[1, -1, 0],
+		[1, 1, 0]
 	]).expand(1, CSG.defaultResolution2D);
 
 	var flatBottom = CSG.Polygon.createFromPoints(
 		cag.getOutlinePaths()[0].points
 	);
- height=50;
+
 
   var thing = flatBottom.solidFromSlices({
 	numslices: height
@@ -127,10 +129,11 @@ function thingTwisted(radius, height) {
 		var h = height*t;
     var y = 0;
     //var e = 1/(Math.sqrt(1+(Math.pow(coef*0.01,3)))); //Hay que hacer una parabola para limitar el comienzo y final dl pulgar
-    var b = 10+Math.sin(coef*3);
-o.push(circle({r:b, center:true}).translate([10,0,0]));
-o.push(circle({r:b, center:true}).translate([-10,0,0]));
+    var b = 10+Math.sin(coef*4);
+o.push(circle({r:b, center:true}).translate([ancho,0,0]));
+o.push(circle({r:b, center:true}).translate([-ancho,0,0]));
 if ((h>=height/6)&&(h<=(height*2/3))){
+
 y=(h-height/6)*(h-(height*2/3))*0.6+2;
 o.push(circle({r:y/10, center:true}).translate([17,9,0]));
 };
@@ -142,15 +145,15 @@ cag =  hull(o); //.expand(1,CSG.defaultResolution2D)
 
 var cage = CAG.circle({
             center: [0,0],
-            radius: 3*Math.sin(coef*1.2),
+            ancho: 3*Math.sin(coef*1.2),
             resolution: 32
        }).expand(1, CSG.defaultResolution2D);
 
     var cags = CAG.fromPoints([
-			[-radius, -radius, h],
-			[radius, -radius, h],
-	 		[radius , radius, h],
-			[-radius, radius, h]
+			[-1, -1, h],
+			[1, -1, h],
+	 		[1 , 1, h],
+			[-1, 1, h]
 		]).expand(1, CSG.defaultResolution2D);
 
 		return CSG.Polygon.createFromPoints(
@@ -162,7 +165,7 @@ var cage = CAG.circle({
   var palma=
   difference(
     union(thing,slider().mirroredZ()).fillet(3,'z+'),
-    cuerpito(height),
+    cuerpito(height,ancho),
     conectores(height),
     contornos(height)
 
