@@ -30,7 +30,7 @@ include('node_modules/jscad-utils/jscad-boxes.jscad');
 
 function main(params) {
   util.init(CSG);
-  var thing = thingTwisted(10, 30);
+  var thing = UpperArm(10, 30);
   return thing;
 
 
@@ -47,18 +47,19 @@ return op;
 
 
 }
-  function thingTwisted(radius, height) {
+  function UpperArm(radius, height) {
 
   	var cag = CAG.fromPoints([
-  		[-radius, -radius, 0],
-  		[radius, -radius, 0],
-  		[radius, radius, 0]
+  		[-1, -1, 0],
+  		[1, -1, 0],
+  		[1, 1, 0]
   	]).expand(1, CSG.defaultResolution2D);
 
   	var flatBottom = CSG.Polygon.createFromPoints(
   		cag.getOutlinePaths()[0].points
   	);
-
+height = 40;
+radius=10;
 
     var thing = flatBottom.solidFromSlices({
   	numslices: height
@@ -69,9 +70,9 @@ return op;
   		var h = height * t;
 
       var r = Math.sin(coef*4.8)+8;
-        o.push(circle({r:r, center:true}).translate([10,0,0]));
-        o.push(circle({r:r, center:true}).translate([-10,0,0]));
-        o.push(square({size: [((Math.sin(coef*4.8)+8)*4)+10,(Math.sin(coef*4.8)+8)], center: true}).translate([0, (Math.sin(coef*4.8)+8)*0.5, 0]));
+        o.push(circle({r:r, center:true}).translate([radius,0,0]));
+        o.push(circle({r:r, center:true}).translate([-radius,0,0]));
+        o.push(square({size: [((Math.sin(coef*4.8)+8)*4)+radius,(Math.sin(coef*4.8)+8)], center: true}).translate([0, (Math.sin(coef*4.8)+8)*0.5, 0]));
 
   var cag =  hull(o).expand(2,CSG.defaultResolution2D);
 
@@ -82,10 +83,10 @@ return op;
          }).expand(2, CSG.defaultResolution2D);
 
       var cags = CAG.fromPoints([
-  			[-radius, -radius, h],
-  			[radius, -radius, h],
-  	 		[radius , radius, h],
-  			[-radius, radius, h]
+  			[-1, -1, h],
+  			[1, -1, h],
+  	 		[1 , 1, h],
+  			[-1, 1, h]
   		]).expand(2, CSG.defaultResolution2D);
 
   		return CSG.Polygon.createFromPoints(
@@ -95,11 +96,13 @@ return op;
     });
 var op=
 difference(
-  union(thing,
+  union(
+    thing,
+    cuerpoconectores().snap(thing, 'z', 'outside+').translate([0, 3, 0])),
+    thing.scale([0.85,0.8,1.3]).translate([0, 0, -1]
+        ),
 
-  cuerpoconectores().snap(thing, 'z', 'outside+').translate([0, 3, 0])),
 
-  thing.scale([0.85,0.8,1.3]).translate([0, 0, -1]),
   cube({size: [50, 100, 70], center: [true, false, true]}).translate([0, 6, 0]), //corta a la mitad
   cylinder({r: 14, h: 50, center: [true, true, true]}).rotateX(90).translate([0, 0, 10]), //cylinder que contornea la parte superior
   //cube({size: [24, 24, 22], center: [true, true, true]}), //cubo conectando a la parte superior
