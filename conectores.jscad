@@ -30,7 +30,8 @@ cube([r*2, r*h, r]).translate([-r,0,-lh])
   );
 
 }
-function pinhole({h, r, lh, lt, t=0.3, tight=true} = {}) {
+function pinhole(h, r, lh, lt, t=0.3) {
+  tight=true;
   var ret = union(
     pin_solid(h, r+(t/2), lh, lt),
     cylinder({h:h+0.2, r:r}),
