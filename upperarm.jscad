@@ -19,7 +19,6 @@
 
 //function UpperArm(xtop,x,ypalm,zpalm) {
 
-
 include('lodash.js');
 
 include("node_modules/jscad-utils/jscad-utils.jscad");
@@ -33,9 +32,8 @@ function main(params) {
   util.init(CSG);
   var min;
   alto=50;
-return              redondeo(-4,alto/2,0,0,alto,0).translate([0, 0, alto-13]);
-  return UpperArm(40,50)
-
+//return              redondeo(-4,alto/2,0,0,alto,0).translate([0, 0, alto-13]);
+  return UpperArm(30,60)
 }
 
 function UpperArm(anchomuneca,alto) {
@@ -56,42 +54,33 @@ function UpperArm(anchomuneca,alto) {
                     body,
                     cuerpoconectores(anchomuneca,alto).snap(body, 'z', 'outside+').translate([anchomuneca/2, 4, 0]),
                     cuerpoconectores(anchomuneca,alto).snap(body, 'z', 'outside+').translate([-anchomuneca/2-3, 4, 0])
-
-
-
                     ),
 
               cube({size: [80, 100, alto*2], center: [true, false, true]}).translate([0, 6, 0]), //corta a la mitad
 
               //cube({size: [24, 24, 22], center: [true, true, true]}), //cubo conectando a la parte superior
 
-             cylinder({r: 13, h: 100, center: [true, true, true]}).rotateY(90).translate([0, -17,9]),
+             cylinder({r: 13, h: 100, center: [true, true, true]}).rotateY(90).translate([0, -17,9]),// contornosuperior
              cylinder({r: 13, h: 100, center: [true, true, true]}).rotateY(90).translate([0, -15,7]),
              cylinder({r: 13, h: 100, center: [true, true, true]}).rotateY(90).translate([0, -14,5]),
-             cylinder({r: 13, h: 100, center: [true, true, true]}).rotateY(90).translate([0, -13,0]), // contornosuperior
-             cylinder({r: 13, h: 100, center: [true, true, true]}).rotateY(90).translate([0, 7,alto]), // contornosuperior
+             cylinder({r: 13, h: 100, center: [true, true, true]}).rotateY(90).translate([0, -13,0]),
+             cylinder({r: 13, h: 100, center: [true, true, true]}).rotateY(90).translate([0, 7,alto]),
+             // contornoinferior
              cylinder({r: 13, h: 100, center: [true, true, true]}).rotateY(90).translate([0, 5,alto]),
              cylinder({r: 13, h: 100, center: [true, true, true]}).rotateY(90).translate([0, 3,alto]),
              cylinder({r: 13, h: 100, center: [true, true, true]}).rotateY(90).translate([0, 1,alto]),
-             cylinder({r: 13, h: 100, center: [true, true, true]}).rotateY(90).translate([0, 0,alto])
+             cylinder({r: 13, h: 100, center: [true, true, true]}).rotateY(90).translate([0, 0,alto]), //---
+             //velcros ext
+
+             cube({size: [grosor*2,2.5,alto/3], round: true}).translate([(anchomuneca/2)+5, 1, alto/3]),//izq
+             cube({size: [grosor*2,2.5,alto/3], round: true}).translate([-(anchomuneca/2)-12, 1, alto/3]), //der
+             //velcro inter
+
+             cube({size: [grosor*3,3,alto/3],center: [true,false,false], round: true}).translate([(anchomuneca/2)+5, -3, alto/3]), //3 = ancho para velcro 2 = espacio
+             cube({size: [grosor*2,3,alto/3], round: true}).translate([-(anchomuneca/2)-12, -3, alto/3]) //der
+
 
     );
-
-  /*  op= union(
-            op,
-            difference(
-            conectoreslaterlates(anchomuneca/2+grosor+5,alto).snap(body,'y','outside-').translate([0, -6, 0]),
-
-            conectoreslaterlates(anchomuneca/2+5,alto).snap(body,'y','outside-').translate([0, -6, 0]),
-            cylinder({r: 4, h: 10, center:false}).rotateY(90).snap(body,'y','outside-').snap(body,'x','inside+').translate([0, -2, alto/2])
-
-          ),
-
-difference(
-            sphere({r: 5, center: [true, true, true]}).snap(body,'y','outside-').snap(body,'x','inside+').translate([1, -4, alto/2]),
-            pinhole(5,2,5,2,0).rotateY(90).snap(body,'y','outside-').snap(body,'x','inside+').translate([0, -2, alto/2])
-)
-          )*/
             return op;
           }
 
@@ -255,7 +244,7 @@ function conectoreslaterlates(anchomuneca,height) {
       var o = new Array();
 
 
-      o.push(square({size: [1, 10, 14]}).translate([t, 0, 0]));
+      o.push(square({size: [1, 10, 1]}).translate([t, 0, 0]));
 
       cag =  hull(o); //.expand(1,CSG.defaultResolution2D)
 
@@ -274,7 +263,7 @@ function conectoreslaterlates(anchomuneca,height) {
 
 
 
-function calculate(x1,x2,y,yaux)
+function calculate(x1,x2,y,yaux) //parabola de dos puntos libres
 {
     sgnb=" +"; sgnc=" +";
     a = x1; //x1
@@ -318,7 +307,7 @@ yans = sgnb + yans;
 return [xans,yans,zans];
 }
 
-function calculate2(x0,y0,x1,y1,x2,y2)
+function calculate2(x0,y0,x1,y1,x2,y2) //parabola de 3 puntos libres
 {
     sgnb=" +"; sgnc=" +";
     a = x0; //x1
