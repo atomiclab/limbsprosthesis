@@ -14,27 +14,19 @@ include("node_modules/jscad-utils/jscad-utils-color.jscad");
 include('node_modules/jscad-utils/jscad-utils-parts.jscad');
 include('node_modules/jscad-utils/jscad-boxes.jscad');
 
-function getParameterDefinitions() {
-  return [
-    { name: 'largodedos', type: 'float', initial: 5, caption: "x:" },
-    { name: 'y', type: 'float', initial: 30, caption: "y:" },
-    { name: 'z', type: 'float', initial: 8, caption: "z:" },
-    { name: 'altopata', type: 'float', initial: 20, caption: "altopata" },
-    { name: 'colors', type: 'choice', caption: "Colores", values:["red", "blue", "black"], captions:["Rojo", "Azul", "Negro"], initial: "Rojo" },
-  ];
-}
- var r = [], y = [], t = [];
- var result,xbottom,cono, ext, int, pata, l;
 
 
-function CuatroDedos(largodedos){ //Cuatro dedos
+
+function CuatroDedos(largodedos,alto){ //Cuatro dedos
 var w = [];
+var separaciondedos = alto/4;
    for (var i =0; i<=3; i+=1) {
           l = largodedos+abs((sin(i*50))); //curva dedos
-          w.push(translate([ 0, 0, i*10], dedo(l))); //uno arriba del otro separado
+          console.log(l);
+          w.push(translate([ 0, 0, i*separaciondedos], dedo(l))); //uno arriba del otro separado
           if (i <=2){ // cubos en el medio
-            w.push(cube({size:[10,5,8], center:[true,true,false], round:true}).translate([5,0,(i*10+3)]).rotateZ(25));
-          }else{}
+            w.push(cube({size:[separaciondedos,5,8], center:[true,true,false], round:true}).translate([5,0,(i*separaciondedos+3)]).rotateZ(25));
+          }
     }
 
 
@@ -57,31 +49,52 @@ function dedo(largo){ //Un dedo con largo variable
    }
 
      var fwhole=difference(
-    linear_extrude({height: 5}, chain_hull(o))
+    linear_extrude({height: 5}, chain_hull(o)) //anchodedos
        .fillet(2,'z+')
        .fillet(2,'z-'),
-    linear_extrude({height:7}, chain_hull(oin)))
+    linear_extrude({height:7}, chain_hull(oin)))//anchocorteinternodedos
    return [fwhole];
 }
 
+function fingers(largo,alto,r) {
 
-function main(params) {
-    util.init(CSG);
   var result =
     difference(
             union(
-              CuatroDedos(params.largodedos)),
+              CuatroDedos(largo,alto)),
             union(
                 cylinder({d: 30, h: 2}), // cilindro bajo
-                cylinder({d: 20, h: 25}).translate([3,0,5]), //cilindro pasador
-                cylinder({d: 30, h: 20}).translate([0,0,32.5]), //cilindro superior
-                cylinder({d: 45, h: 50, fn:32}).translate([-13,0,0])
+                cylinder({d: 20, h: alto/1.5}).translate([3,0,4]), //cilindro pasador
+                cylinder({d: 30, h: 20}).translate([0,0,(alto/1.5)+6]), //cilindro superior
+                cylinder({d: 45, h: alto, fn:32}).translate([-13,0,0])
              ).translate([-11,0,0]), //desfasaje
-                cylinder({d:3, h:40}).translate([1,-2,0]),
-                cylinder({d:3, h:40}).translate([1,3,0])
+                cylinder({d:3, h:alto}).translate([1,-2,0]),
+                cylinder({d:3, h:alto}).translate([1,3,0])
               //  cube({size: [params.largodedos*2.5,5,45],round:true}).rotateZ(43-params.largodedos).translate([3.4*(params.largodedos),1.2*(log(params.largodedos*2)*2),-5])
     );
-   return result;
+
+    if (r==1) {
+      return  result; //Dedos Der
+    }else {
+      var piso= cube({size: [1, 1, 1], center: [true, true, false]})
+      return  result
+                  .mirroredZ()
+                  .snap(piso,'z-','inside-'); //dedos IZQ
+    }
+
+}
+
+function main() {
+
+  var largo=6;
+  var alto=30;
+  var r=1; //Der = 1, Izq = 0;
+  util.init(CSG);
+  return fingers(largo,alto,r);
+
+
+
+
 
 }
 
