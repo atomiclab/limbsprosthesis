@@ -40,8 +40,7 @@ function main(params) {
 function UpperArm(anchomuneca,alto) {
 
     var grosor = 3;
-    var shelter1 = 0;
-    var shelter2 = 0;
+    var shelter1, shelter2=0;
 
     var body =
             difference(
@@ -57,7 +56,7 @@ function UpperArm(anchomuneca,alto) {
                     cuerpoconectores(anchomuneca,alto).snap(body, 'z', 'outside+').translate([-anchomuneca/2-3, 4, 0])
                     ),
 
-              cube({size: [80, 100, alto*2], center: [true, false, true]}).translate([0, 6, 0]), //corta a la mitad
+              cube({size: [ancho*4, alto*2, alto*2], center: [true, false, true]}).translate([0, 6, 0]), //corta a la mitad
 
               //cube({size: [24, 24, 22], center: [true, true, true]}), //cubo conectando a la parte superior
 
@@ -73,12 +72,12 @@ function UpperArm(anchomuneca,alto) {
              cylinder({r: 13, h: 100, center: [true, true, true]}).rotateY(90).translate([0, 0,alto]), //---
              //velcros ext
 
-             cube({size: [grosor*2,2.5,alto/3], round: true}).translate([(anchomuneca/2)+5, 1, alto/3]),//izq
-             cube({size: [grosor*2,2.5,alto/3], round: true}).translate([-(anchomuneca/2)-12, 1, alto/3]), //der
+             cube({size: [grosor*3,2.5,alto/3], round: true}).translate([(anchomuneca/2)+5, 1, alto/3]),//izq
+             cube({size: [grosor*3,2.5,alto/3], round: true}).translate([-(anchomuneca/2)-12, 1, alto/3]), //der
              //velcro inter
 
-             cube({size: [grosor*3,3,alto/3],center: [true,false,false], round: true}).translate([(anchomuneca/2)+5, -3, alto/3]), //3 = ancho para velcro 2 = espacio
-             cube({size: [grosor*2,3,alto/3], round: true}).translate([-(anchomuneca/2)-12, -3, alto/3]) //der
+             cube({size: [grosor*4.5,3,alto/3], round: true}).translate([(anchomuneca/2)+4.5, -3, alto/3]), //3 = ancho para velcro 2 = espacio
+             cube({size: [grosor*3,3,alto/3], round: true}).translate([-(anchomuneca/2)-12, -3, alto/3]) //der
 
 
     );
