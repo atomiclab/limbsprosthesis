@@ -234,45 +234,28 @@ union(
 		.translate([-20, 10, 0])
 
 	),
+	tornillotuerca(4,2.5)[0]//tuerca de tapa
+	.rotateX(90)
+	.snap(todo,'y','outside+')
+	.translate([0, 4, (height/2.5)+5]),
 
 	tornillotuerca(5,1.75)[0] //tuerca de pulgar
 	.rotateY(90)
 	.snap(palma,'y','outside-')
 	.snap(palma,'x','outside-')
 	.translate([-6.25, -9, height/2.5])
+
 )
-
-todosin=
-union(
-	todosin,
-	cylinder({r: 3, h: 5, center: [true, true, true]}) //cilindrotapa
-	.rotateY(90)
-	.rotateZ(90)
-	.snap(todo,'y','outside+')
-	.translate([0, 4, (height/2.5)+5]),
-
-	tornillotuerca(4,2.5)[0]//tuerca de tapa
-	.rotateX(90)
-	.snap(todo,'y','outside+')
-	.translate([0, 4, (height/2.5)+5])
-);
-caca=
-difference(cylinder({r:5, h:8, center:[true,true,true]})//tuerca de tapa
-.rotateY(90)
-.snap(palma,'y','outside-')
-.snap(palma,'x','outside-')
-.translate([-6.25, -9, height/2.5])
-,todosin);
 todo =
 difference(
-	union(
 		todo,
-		cylinder({r:4, h:2.5, center:[true,true,true]})//tuerca de tapa
-		.rotateX(90)
-		.snap(todo,'y','outside+')
-		.translate([0, 4, (height/2.5)+5])
-	),
-caca
+		difference(cylinder({r:5, h:8, center:[true,true,true]})//tuerca de tapa
+			.rotateY(90)
+			.snap(palma,'y','outside-')
+			.snap(palma,'x','outside-')
+			.translate([-6.25, -9, height/2.5])
+			,
+		todosin)
 );
 
 
