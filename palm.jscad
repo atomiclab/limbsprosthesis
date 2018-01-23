@@ -121,11 +121,12 @@ function palmagenerator(ancho, height,muneca,pulgar) {
 		cag.getOutlinePaths()[0].points
 	);
 
-
+	var tope;
 	var thing = flatBottom.solidFromSlices({
 		numslices: height
 		,callback: function(t) {
 			var coef = t;
+
 			var o = new Array();
 			if (coef < 0.01) coef = 0.01;//must not collapse polygon
 			var h = height*t;
@@ -135,10 +136,17 @@ function palmagenerator(ancho, height,muneca,pulgar) {
 			o.push(circle({r:b, center:true}).translate([ancho,0,0]));
 			o.push(circle({r:b, center:true}).translate([-ancho,0,0]));
 			if (pulgar) {
-				if ((h>=height/7)&&(h<=(height*2/3))){
-					var vals = calculate(height/7,height*2/3,height/5,0);
+				//				if ((h>=height/7)&&(h<=(height*2/3))){
+				if (height*2/3>=40) { //pongo valor de altura fijo a la curvatura pulgar
+					tope = 40;
+				}else {
+					tope=height*2/3;
+				}
+
+				if ((h>=0.1)&&(h<=(tope))){
+					var vals = calculate(0.1,height*2/3,height/5,0);
 					x = (vals[0]*Math.pow(h,2)) + (vals[1]*h) + vals[2];
-					o.push(circle({r: x, center: true}).translate([alto*2, 8, 0]))
+					o.push(circle({r: x/2, center: true}).translate([alto*2, 8, 0]))
 				}
 		}
 
@@ -206,11 +214,11 @@ union(
 		.snap(todo,'y','outside+')
 		.translate([0, 4, (height/2.5)+5]),
 
-		cylinder({r: 2.75, h: muneca/2, center: [true, true, true]})
+		cylinder({r: 3, h: muneca/2, center: [true, true, true]})
 		.rotateY(90)
 		.snap(palma,'y','outside-')
 		.snap(palma,'x','outside-')
-		.translate([-6.25, -9, height/2.5]),
+		.translate([-6.25, -alto, tope*0.5]),
 
 		cube({size: [10, 10, 100], center: [true, false, false]}) //Cubo que "limpia" el borde derecho
 		.translate([-20, 10, 0])
@@ -221,21 +229,21 @@ union(
 	.snap(todo,'y','outside+')
 	.translate([0, 4, (height/2.5)+5]),
 
-	tornillotuerca(5,1.75)[0] //tuerca de pulgar
+	tornillotuerca(6,1.75)[0] //tuerca de pulgar
 	.rotateY(90)
 	.snap(palma,'y','outside-')
 	.snap(palma,'x','outside-')
-	.translate([-6.25, -9, height/2.5])
+	.translate([-6.25, -alto, tope*0.5])
 
 )
 todo =
 difference(
 	todo,
-	difference(cylinder({r:5, h:8, center:[true,true,true]})//tuerca de tapa
+	difference(cylinder({r:8, h:8, center:[true,true,true]})//tuerca de pulgar
 	.rotateY(90)
 	.snap(palma,'y','outside-')
 	.snap(palma,'x','outside-')
-	.translate([-6.25, -9, height/2.5])
+	.translate([-6.25, -alto, tope*0.5])
 	,
 	todosin)
 );
