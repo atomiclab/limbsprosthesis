@@ -72,7 +72,7 @@ function slider(alto) {
 function bajorelieve(height,prof, alto) { //se
 
 	var h = hull(
-		square({size: [(alto*2)+(alto/4),1], center: true}).translate([0, height,0 ]),
+		square({size: [alto*3,1], center: true}).translate([0, height,0 ]),
 		circle({r: alto, center: true}).translate([0,height/6,0])
 	);
 	var tapa = linear_extrude({ height: prof }, h);
@@ -99,13 +99,14 @@ function contornos(alto) {
 }
 function cuerpito(h,ancho) {
 	var o = new Array();
-	o.push(circle({r:ancho, center:true}).translate([ancho,0,0]));
-	o.push(circle({r:ancho, center:true}).translate([-ancho,0,0]));
-	o.push(square({size: [ancho*4,10], center: true}).translate([0, 5, 0]));
-	o.push(square({size:[ancho*4,40], center:true}).translate([0, 20, 0]))
+	var thi=10;
+	o.push(circle({r:ancho-thi/2, center:true}).translate([ancho,0,0]));
+	o.push(circle({r:ancho-thi/2, center:true}).translate([-ancho,0,0]));
+	o.push(square({size: [ancho*4-thi,10], center: true}).translate([0, 5, 0]));
+	o.push(square({size:[ancho*4-thi,40], center:true}).translate([0, 20, 0]))
 	o = linear_extrude({ height: h }, hull(o));
 	console.log("ancho"+ancho);
-	return o.scale([0.75,0.7,2]);
+	return o //o.scale([0.75,0.7,2]);
 }
 
 
