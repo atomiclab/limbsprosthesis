@@ -21,7 +21,7 @@ include("tornillotuerca.jscad");
 
 var result,xbo;
 var long=60;
-var alto=20;
+var alto=10;
 var muneca=15;// nada
 var pinconector=2;
 var tornilloconector=3;
@@ -44,12 +44,9 @@ function slider(alto) {
 	var b = new Array();
 	var last=1;
 	var long=0;
-
 	x.push(square({size: [alto*4,alto*4]}).center('x'));
-
 	o.push(circle({r:alto, center:true}).translate([alto,0,0]));
 	o.push(circle({r:alto, center:true}).translate([-alto,0,0]));
-
 	g.push(linear_extrude({ height: 5 }, hull(o)));
 	d.push(linear_extrude({ height: 8 }, hull(x)));
 	b.push(union(g).subtract(union(d)));
@@ -195,10 +192,10 @@ function palmagenerator(ancho, height,muneca,pulgar) {
 	);
 	function oppulgar() {
 		var cubo = new Array();
-
-		cubo.push(cube({size: [3.5, 10, 28], center: [true, false, false]})
+		var th=3;
+		cubo.push(cube({size: [th, 10, long/2-4], center: [true, false, false]})
 		.snap(palma,'y','outside-')
-		.translate([18, -8, 0])
+		.translate([(alto*2)-th, -alto+th, 4])
 	);
 
 	return union(cubo);
@@ -231,7 +228,7 @@ union(
 		.snap(palma,'x','outside-')
 		.translate([-6.25, -alto, tope*0.5]),
 
-		cube({size: [10, 10, 100], center: [true, false, false]}) //Cubo que "limpia" el borde derecho
+		cube({size: [alto*4, alto*4, long+10], center: [true, false, false]}) //Cubo que "limpia" el borde derecho
 		.translate([-20, 10, 0])
 
 	),
