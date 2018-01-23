@@ -21,7 +21,7 @@ include("tornillotuerca.jscad");
 
 var result,xbo;
 var long=60;
-var alto=10;
+var alto=20;
 var muneca=15;// nada
 var pinconector=2;
 var tornilloconector=3;
@@ -36,19 +36,27 @@ function main()
 
 function slider(alto) {
 
-	var o = new Array();
-	var g = new Array();
+	var o = new Array(); //shape of the palm
+	var g = new Array(); //object 3D
+	var d = new Array(); //object 3D
+	var x = new Array();
+	var k = new Array();
+	var b = new Array();
 	var last=1;
 	var long=0;
 
-
+	x.push(square({size: [alto*4,alto*4]}).center('x'));
 
 	o.push(circle({r:alto, center:true}).translate([alto,0,0]));
 	o.push(circle({r:alto, center:true}).translate([-alto,0,0]));
-	o.push(square({size: [alto*4,10], center: true}).translate([0, 5, 0]));
 
-	g.push(linear_extrude({ height: 5 }, hull(o)).translate([0, 0, 0]));
+	g.push(linear_extrude({ height: 5 }, hull(o)));
+	d.push(linear_extrude({ height: 8 }, hull(x)));
+	b.push(union(g).subtract(union(d)));
+		///cuerpo sin parteabajoish
+	k.push(square({size: [alto*4,10], center: true}).translate([0, 5, 0]));
 
+	b.push(linear_extrude({ height: 5 }, hull(k)));
 
 
 	var todo = union(
@@ -59,7 +67,7 @@ function slider(alto) {
 
 
 
-	todo= union(g).subtract(todo.rotateX(-90).rotateZ(90).snap(union(g), 'x', 'inside-').translate([-1, -1, 0]));
+	todo= union(b).subtract(todo.rotateX(-90).rotateZ(90).snap(union(b), 'x', 'inside-').translate([-1, -1, 0]));
 	todo= todo.subtract(cylinder({r: 1, h: 20, center: true}).rotateX(-90).snap(todo, 'x', 'center-').translate([-1,0, 2]));
 
 	todo=todo.subtract(cube({size: [10, 10, 5], center: [true, true, true]}).snap(todo,'y','outside+').translate([5, 0, 0]) );
@@ -70,10 +78,9 @@ function slider(alto) {
 
 
 function bajorelieve(height,prof, alto) { //se
-
 	var h = hull(
-		square({size: [alto*3,1], center: true}).translate([0, height,0 ]),
-		circle({r: alto, center: true}).translate([0,height/6,0])
+		square({size: [(alto*4)-10,1], center: true}).translate([0, height-height/4,0 ]),
+		circle({r: alto, center: true}).translate([0,-height*0.003125,0])
 	);
 	var tapa = linear_extrude({ height: prof }, h);
 
@@ -104,8 +111,11 @@ function cuerpito(h,ancho) {
 	o.push(circle({r:ancho-thi/2, center:true}).translate([-ancho,0,0]));
 	o.push(square({size: [ancho*4-thi,10], center: true}).translate([0, 5, 0]));
 	o.push(square({size:[ancho*4-thi,40], center:true}).translate([0, 20, 0]))
+
+
 	o = linear_extrude({ height: h }, hull(o));
-	console.log("ancho"+ancho);
+
+
 	return o //o.scale([0.75,0.7,2]);
 }
 
@@ -149,49 +159,49 @@ function palmagenerator(ancho, height,muneca,pulgar) {
 					x = (vals[0]*Math.pow(h,2)) + (vals[1]*h) + vals[2];
 					o.push(circle({r: x/2, center: true}).translate([alto*2, 8, 0]))
 				}
+			}
+
+			o.push(square({size: [alto*4,10], center: true}).translate([0, 5, 0]));
+
+			cag =  hull(o); //.expand(1,CSG.defaultResolution2D)
+
+			var cage = CAG.circle({
+				center: [0,0],
+				ancho: 3*Math.sin(coef*1.2),
+				resolution: 32
+			}).expand(1, CSG.defaultResolution2D);
+
+			var cags = CAG.fromPoints([
+				[-1, -1, h],
+				[1, -1, h],
+				[1 , 1, h],
+				[-1, 1, h]
+			]).expand(1, CSG.defaultResolution2D);
+
+			return CSG.Polygon.createFromPoints(
+				cag.getOutlinePaths()[0].points
+			).translate([0, 0, h]);
 		}
+	});
 
-		o.push(square({size: [alto*4,10], center: true}).translate([0, 5, 0]));
-
-		cag =  hull(o); //.expand(1,CSG.defaultResolution2D)
-
-		var cage = CAG.circle({
-			center: [0,0],
-			ancho: 3*Math.sin(coef*1.2),
-			resolution: 32
-		}).expand(1, CSG.defaultResolution2D);
-
-		var cags = CAG.fromPoints([
-			[-1, -1, h],
-			[1, -1, h],
-			[1 , 1, h],
-			[-1, 1, h]
-		]).expand(1, CSG.defaultResolution2D);
-
-		return CSG.Polygon.createFromPoints(
-			cag.getOutlinePaths()[0].points
-		).translate([0, 0, h]);
-	}
-});
-
-var palma=
-difference(
-	union(thing,slider(alto).mirroredZ()).fillet(3,'z+'),
-	cuerpito(height,ancho),
-	conectores(height),
-	contornos(height)
+	var palma=
+	difference(
+		union(thing,slider(alto).mirroredZ()).fillet(3,'z+'),
+		cuerpito(height,ancho),
+		conectores(height),
+		contornos(height)
 
 
-);
-function oppulgar() {
-	var cubo = new Array();
+	);
+	function oppulgar() {
+		var cubo = new Array();
 
-	cubo.push(cube({size: [3.5, 10, 28], center: [true, false, false]})
-	.snap(palma,'y','outside-')
-	.translate([18, -8, 0])
-);
+		cubo.push(cube({size: [3.5, 10, 28], center: [true, false, false]})
+		.snap(palma,'y','outside-')
+		.translate([18, -8, 0])
+	);
 
-return union(cubo);
+	return union(cubo);
 }
 
 
