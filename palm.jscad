@@ -17,11 +17,16 @@ include('node_modules/jscad-utils/jscad-utils-parts.jscad');
 include('node_modules/jscad-utils/jscad-boxes.jscad');
 
 include("tornillotuerca.jscad");
-
-
+// TODO: limpiar costado izquierdo
+// Arreglar protuberancia pulgar
+// arreglar tapa
+// ver que pasa cuando proporcion alto => long*1/4
+// tuerca pulgar
+// thinkness
+// agregar texto "Atomic Lab" y el nombre de usuario
 var result,xbo;
-var long=60;
-var alto=10;
+var long=120;
+var alto=30;
 var muneca=15;// nada
 var pinconector=2;
 var tornilloconector=3;
@@ -34,7 +39,7 @@ function main()
 }
 
 
-function slider(alto) {
+function slider(alto) { //limpiar
 
 	var o = new Array(); //shape of the palm
 	var g = new Array(); //object 3D
@@ -74,7 +79,7 @@ function slider(alto) {
 }
 
 
-function bajorelieve(height,prof, alto) { //se
+function bajorelieve(height,prof, alto) { //corregir el cilindro
 	var h = hull(
 		square({size: [(alto*4)-10,1], center: true}).translate([0, height-height/4,0 ]),
 		circle({r: alto, center: true}).translate([0,-height*0.003125,0])
@@ -88,17 +93,18 @@ function bajorelieve(height,prof, alto) { //se
 
 function conectores(alto) {
 	var o = new Array();
-	o.push(cube({size: [100, 2, alto/2], center: [true, true, true]}).translate([0, 2, alto/2.5]));
-	o.push(cube({size: [100, 2, alto/2], center: [true, true, true]}).translate([0, -2, alto/2.5]));
+	o.push(cube({size: [alto*4, 2, alto/2], center: [true, true, true]}).translate([0, 2, alto/2.5]));
+	o.push(cube({size: [alto*4, 2, alto/2], center: [true, true, true]}).translate([0, -2, alto/2.5]));
 	o.push(cylinder({r: 2.75, h: alto, center: [true, true, true]}).rotateX(90).rotateZ(90).translate([0, 5, alto-5]));
 
 
 	return union(o);
 }
-function contornos(alto) {
+function contornos(alto,ancho) {
 	var o = new Array();
-	o.push(cylinder({r: 10, h: alto, center: [true, true, true]}).rotateX(90).rotateZ(90).translate([0, -10, alto]));
-	o.push(cylinder({r: 15, h: alto, center: [true, true, true]}).rotateX(90).translate([0, -10, alto-5]));
+	console.log("gino"+ancho);
+	o.push(cylinder({r: ancho, h: alto, center: [true, true, true]}).rotateX(90).rotateZ(90).translate([0, -ancho, alto])); //contorno de conectores
+	o.push(cylinder({r: ancho+ancho/2, h: alto, center: [true, true, true]}).rotateX(90).translate([0, -ancho, alto-ancho/2])); //contorno de tapa
 	return union(o);
 }
 function cuerpito(h,ancho) {
@@ -139,20 +145,19 @@ function palmagenerator(ancho, height,muneca,pulgar) {
 			if (coef < 0.01) coef = 0.01;//must not collapse polygon
 			var h = height*t;
 			var y = 0;
-			//var e = 1/(Math.sqrt(1+(Math.pow(coef*0.01,3)))); //Hay que hacer una parabola para limitar el comienzo y final dl pulgar
-			var b =alto+Math.sin(coef*4);
+			var b = alto+Math.sin(coef*4);
 			o.push(circle({r:b, center:true}).translate([ancho,0,0]));
 			o.push(circle({r:b, center:true}).translate([-ancho,0,0]));
 			if (pulgar) {
 				//				if ((h>=height/7)&&(h<=(height*2/3))){
-				if (height*2/3>=40) { //pongo valor de altura fijo a la curvatura pulgar
-					tope = 40;
+				if (height*2/3>=50) { //pongo valor de altura fijo a la curvatura pulgar
+					tope = 50;
 				}else {
 					tope=height*2/3;
 				}
 
 				if ((h>=0.1)&&(h<=(tope))){
-					var vals = calculate(0.1,height*2/3,height/5,0);
+					var vals = calculate(0.1,tope,alto+4,0);
 					x = (vals[0]*Math.pow(h,2)) + (vals[1]*h) + vals[2];
 					o.push(circle({r: x/2, center: true}).translate([alto*2, 8, 0]))
 				}
@@ -186,7 +191,7 @@ function palmagenerator(ancho, height,muneca,pulgar) {
 		union(thing,slider(alto).mirroredZ()).fillet(3,'z+'),
 		cuerpito(height,ancho),
 		conectores(height),
-		contornos(height)
+		contornos(height,ancho)
 
 
 	);
@@ -228,7 +233,7 @@ union(
 		.snap(palma,'x','outside-')
 		.translate([-6.25, -alto, tope*0.5]),
 
-		cube({size: [alto*4, alto*4, long+10], center: [true, false, false]}) //Cubo que "limpia" el borde derecho
+		cube({size: [alto*2-5, alto*4, long+10], center: [true, false, false]}) //Cubo que "limpia" el borde derecho
 		.translate([-20, 10, 0])
 
 	),
