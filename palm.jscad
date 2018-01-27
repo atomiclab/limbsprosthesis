@@ -17,16 +17,17 @@ include('node_modules/jscad-utils/jscad-utils-parts.jscad');
 include('node_modules/jscad-utils/jscad-boxes.jscad');
 
 include("tornillotuerca.jscad");
-// TODO: limpiar costado izquierdo
+// TODO:
 // Arreglar protuberancia pulgar
 // arreglar tapa
 // ver que pasa cuando proporcion alto => long*1/4
-// tuerca pulgar
+// posicion tuerca pulgar
 // thinkness
 // agregar texto "Atomic Lab" y el nombre de usuario
+//curvabezier en contornos
 var result,xbo;
-var long=120;
-var alto=30;
+var long=60;
+var alto=10;
 var muneca=15;// nada
 var pinconector=2;
 var tornilloconector=3;
@@ -35,6 +36,7 @@ function main()
 {
 	util.init(CSG);
 	var palma = palmagenerator(alto, long, muneca, pulgar);
+	//console.log(palma.getfeatures(['volume']));
 	return palma;
 }
 
@@ -55,7 +57,7 @@ function slider(alto) { //limpiar
 	g.push(linear_extrude({ height: 5 }, hull(o)));
 	d.push(linear_extrude({ height: 8 }, hull(x)));
 	b.push(union(g).subtract(union(d)));
-		///cuerpo sin parteabajoish
+	///cuerpo sin parteabajoish
 	k.push(square({size: [alto*4,10], center: true}).translate([0, 5, 0]));
 
 	b.push(linear_extrude({ height: 5 }, hull(k)));
@@ -130,12 +132,12 @@ function palmagenerator(ancho, height,muneca,pulgar) {
 		[1, -1, 0],
 		[1, 1, 0]
 	]).expand(1, CSG.defaultResolution2D);
-
 	var flatBottom = CSG.Polygon.createFromPoints(
 		cag.getOutlinePaths()[0].points
 	);
 
 	var tope;
+
 	var thing = flatBottom.solidFromSlices({
 		numslices: height
 		,callback: function(t) {
@@ -146,8 +148,9 @@ function palmagenerator(ancho, height,muneca,pulgar) {
 			var h = height*t;
 			var y = 0;
 			var b = alto+Math.sin(coef*4);
-			o.push(circle({r:b, center:true}).translate([ancho,0,0]));
-			o.push(circle({r:b, center:true}).translate([-ancho,0,0]));
+
+			o.push(circle({r:b, center:true}).translate([ancho,0,0]).subtract(square({size: [alto*4,alto*4]}).center('x')));
+			o.push(circle({r:b, center:true}).translate([-ancho,0,0]).subtract(square({size: [alto*4,alto*4]}).center('x')));
 			if (pulgar) {
 				//				if ((h>=height/7)&&(h<=(height*2/3))){
 				if (height*2/3>=50) { //pongo valor de altura fijo a la curvatura pulgar
@@ -220,21 +223,14 @@ todo=
 union(
 	difference(
 		todo,
-
-		cylinder({r: 3, h: 5, center: [true, true, true]}) //cilindrotapa
-		.rotateY(90)
-		.rotateZ(90)
-		.snap(todo,'y','outside+')
-		.translate([0, 4, (height/2.5)+5]),
-
-		cylinder({r: 3, h: muneca/2, center: [true, true, true]})
+		cylinder({r: 3, h: alto*4, center: [true, true, true]}) //cilindrotapa
+		.rotateX(90)
+		.translate([0, 0, (height/2.5)+5]),
+		cylinder({r: 3, h: muneca/2, center: [true, true, true]}) //cilindropulgar
 		.rotateY(90)
 		.snap(palma,'y','outside-')
 		.snap(palma,'x','outside-')
-		.translate([-6.25, -alto, tope*0.5]),
-
-		cube({size: [alto*2-5, alto*4, long+10], center: [true, false, false]}) //Cubo que "limpia" el borde derecho
-		.translate([-20, 10, 0])
+		.translate([-6.25, -alto, tope*0.5])
 
 	),
 	tornillotuerca(4,2.5)[0]//tuerca de tapa
@@ -247,7 +243,6 @@ union(
 	.snap(palma,'y','outside-')
 	.snap(palma,'x','outside-')
 	.translate([-6.25, -alto, tope*0.5])
-
 )
 todo =
 difference(
@@ -256,8 +251,7 @@ difference(
 	.rotateY(90)
 	.snap(palma,'y','outside-')
 	.snap(palma,'x','outside-')
-	.translate([-6.25, -alto, tope*0.5])
-	,
+	.translate([-6.25, -alto, tope*0.5]),
 	todosin)
 );
 
