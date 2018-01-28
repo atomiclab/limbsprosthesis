@@ -23,16 +23,16 @@ include("tornillotuerca.jscad");
 // agregar texto "Atomic Lab" y el nombre de usuario
 // posicion slider
 var result,xbo;
-var long=50;
-var alto=15;
-
+var long=90;
+var alto=40;
+var nombre= "GT";
 var pinconector=2;
 var tornilloconector=3;
 var pulgar =1;
 function main()
 {
 	util.init(CSG);
-	var palma = palmagenerator(alto, long, pulgar);
+	var palma = palmagenerator(alto, long, pulgar,nombre);
 	//console.log(palma.getfeatures(['volume']));
 	return palma;
 }
@@ -51,27 +51,27 @@ function slider(alto) { //limpiar
 	x.push(square({size: [alto*4,alto*4]}).center('x'));
 	o.push(circle({r:alto, center:true}).translate([alto,0,0]));
 	o.push(circle({r:alto, center:true}).translate([-alto,0,0]));
-	g.push(linear_extrude({ height: 5 }, hull(o)));
+	g.push(linear_extrude({ height: 6 }, hull(o)));
 	d.push(linear_extrude({ height: 8 }, hull(x)));
 	b.push(union(g).subtract(union(d)));
 	///cuerpo sin parteabajoish
 	k.push(square({size: [alto*4,10], center: true}).translate([0, 5, 0]));
 
-	b.push(linear_extrude({ height: 5 }, hull(k)));
+	b.push(linear_extrude({ height: 6 }, hull(k)));
 
 
 	var todo = union(
-		Parts.Triangle(5, alto*5).translate([0, -1, -1]),
-		Parts.Triangle(5, alto*5).translate([5, -1, -1]),
-		cube({size: [5, 10, alto*5], center: [true, true, false]}).translate([2.5, -6, 0])
+		Parts.Triangle(6, alto*5).translate([0, -1, -1]),
+		Parts.Triangle(6, alto*5).translate([5, -1, -1]),
+		cube({size: [6, 10, alto*5], center: [true, true, false]}).translate([2.5, -6, 0])
 	).translate([(-alto/2)+3, 0, 0]);
 
 
 
 	todo= union(b).subtract(todo.rotateX(-90).rotateZ(90).snap(union(b), 'x', 'inside-').translate([-1, -1, 0]));
-	todo= todo.subtract(cylinder({r: 1, h: 20, center: true}).rotateX(-90).snap(todo, 'x', 'center-').translate([-1,0, 2]));
+	todo= todo.subtract(cylinder({r: 1, h: alto*2, center: true}).rotateX(-90).snap(todo, 'x', 'center-').translate([-1,0, 2]));
 
-	todo=todo.subtract(cube({size: [10, 10, 5], center: [true, true, true]}).snap(todo,'y','outside+').translate([5, 0, 0]) );
+	todo=todo.subtract(cube({size: [10, 10, 6], center: [true, true, true]}).snap(todo,'y','outside+').translate([6, 0, 0]) );
 
 	return todo;
 
@@ -226,7 +226,8 @@ todo=difference(palma,todo,oppulgar());
 var todosin=todo;
 vals = calculate(0.1,tope,alto+4,0);
 x = (vals[0]*Math.pow(tope/2,2)) + (vals[1]*tope/2) + vals[2]; //calculo curva ymax
-console.log("x"+x);
+var s = todo.size();
+console.log("tamanio"+s);
 todo=
 union(
 	difference(
@@ -252,7 +253,10 @@ union(
 	.snap(palma,'x','outside-')
 	.translate([-6.25, -alto, tope*0.5])
 */
+
+
 )
+
 todo =
 difference(
 	todo,
@@ -264,12 +268,33 @@ difference(
 			todosin
 		)
 );
+todo=difference(
+	todo,
+	util.label("Atomic Lab") //CC
+		.rotateX(90)
+		.scale([1,4,1])
+		//.align(todo, 'xy')
+		//.align(todo, 'xy')
+		.fit([s.x - alto*2-10, s.y - alto, s.z-5],true)
+		.snap(todo, 'y', 'outside+')
+		.translate([0, 2.5, 5])
+		.color('red'),
 
+	util.label(nombre+","+alto+","+long) //Nombre + data
+		.rotateZ(180)
+		.scale([1,1,5])
+		//.align(todo, 'xy')
+		//.align(todo, 'xy')
+		.fit([s.x - alto*2, s.y - alto, s.z-5],true)
+		.center('z')
+		.translate([0, -alto/2, 0])
+		.color('red'),
 
-return todo.subtract(
-cylinder({r:4.5, h:3, center:[true,true,true]})//bajorelieve de pulgar
-.rotateY(90)
-.snap(palma,'x','outside-')
-.translate([-3, x-5, (tope*0.5)]));//difference(todo,difference(todo,todosin));
+	cylinder({r:4.5, h:3, center:[true,true,true]})//bajorelieve de pulgar
+		.rotateY(90)
+		.snap(palma,'x','outside-')
+		.translate([-3, x-5, (tope*0.5)])
+	);
 
+return todo//difference(todo,difference(todo,todosin));
 }
