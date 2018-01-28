@@ -18,24 +18,21 @@ include('node_modules/jscad-utils/jscad-boxes.jscad');
 
 include("tornillotuerca.jscad");
 // TODO:
-// Arreglar protuberancia pulgar
 // arreglar tapa
-// ver que pasa cuando proporcion alto => long*1/4
-
-// thinkness
+// x del pulgar
 // agregar texto "Atomic Lab" y el nombre de usuario
-// curvabezier en contornos, funcion 1 * ancho-ancho chequear porc
+// posicion slider
 var result,xbo;
-var long=90;
-var alto=30;
-var muneca=15;// nada
+var long=50;
+var alto=15;
+
 var pinconector=2;
 var tornilloconector=3;
 var pulgar =1;
 function main()
 {
 	util.init(CSG);
-	var palma = palmagenerator(alto, long, muneca, pulgar);
+	var palma = palmagenerator(alto, long, pulgar);
 	//console.log(palma.getfeatures(['volume']));
 	return palma;
 }
@@ -67,7 +64,7 @@ function slider(alto) { //limpiar
 		Parts.Triangle(5, alto*5).translate([0, -1, -1]),
 		Parts.Triangle(5, alto*5).translate([5, -1, -1]),
 		cube({size: [5, 10, alto*5], center: [true, true, false]}).translate([2.5, -6, 0])
-	);
+	).translate([(-alto/2)+3, 0, 0]);
 
 
 
@@ -82,12 +79,20 @@ function slider(alto) { //limpiar
 
 
 function bajorelieve(height,prof, alto) { //corregir el cilindro
+
 	var h = hull(
+			square({size: [(alto*2)-3,1], center: true}).translate([0,height-alto,0 ]),//alto*4 - thickness
+			circle({r: alto/2, center: true}).translate([0,10+alto/2,0])
+		);
+		h=h.subtract(square({size: [alto*4,alto]}).translate([-alto*2,height-alto,0]));
+		var tapa = linear_extrude({ height: prof }, h);
+
+/*	var h = hull(
 		square({size: [(alto*4)-10,1], center: true}).translate([0, height-height/4,0 ]),
 		circle({r: alto, center: true}).translate([0,-height*0.003125,0])
 	);
 	var tapa = linear_extrude({ height: prof }, h);
-
+*/
 
 	return tapa.rotateX(90);
 
@@ -104,10 +109,9 @@ function conectores(alto) {
 }
 function contornos(alto,ancho) {
 	var o = new Array();
-	var porc=1-(((alto/2.5)+10)/alto);
+	var porc=1-(((alto/2)-5)/alto);
 	o.push(cylinder({r: ancho, h: alto*4, center: [true, true, true]}).rotateX(90).rotateZ(90).translate([0, -ancho, alto])); //contorno de conectores
-	o.push(cylinder({r: ancho+ancho/2, h: alto, center: [true, true, true]}).rotateX(90).translate([0, -ancho, alto-ancho/2]).scale([1,porc,1])); //contorno de tapa
-	console.log("porcentaje"+(((alto/2.5)-5)/alto+"caca"+porc));
+	o.push(cylinder({r: ancho+ancho/4, h: alto, center: [true, true, true]}).scale([1,porc,1]).rotateX(90).translate([0, -ancho, alto-ancho/2])); //contorno de tapa
 	return union(o);
 }
 function cuerpito(h,ancho) {
@@ -126,7 +130,7 @@ function cuerpito(h,ancho) {
 }
 
 
-function palmagenerator(ancho, height,muneca,pulgar) {
+function palmagenerator(ancho, height,pulgar) {
 
 	var cag = CAG.fromPoints([
 		[-1, -1, 0],
@@ -214,12 +218,15 @@ function palmagenerator(ancho, height,muneca,pulgar) {
 //  palma= palma.snap(bajorelieve(height), 'x', 'center-');
 todo= bajorelieve(height,8,alto)
 .snap(palma, 'y', 'outside+')
-.translate([0, 3, height/3]);
+.translate([0, 3, 0]);
 
 
 
 todo=difference(palma,todo,oppulgar());
 var todosin=todo;
+vals = calculate(0.1,tope,alto+4,0);
+x = (vals[0]*Math.pow(tope/2,2)) + (vals[1]*tope/2) + vals[2]; //calculo curva ymax
+console.log("x"+x);
 todo=
 union(
 	difference(
@@ -229,7 +236,7 @@ union(
 		.translate([0, 0, (height/2.5)+5]),
 		cylinder({r: 3, h: alto, center: [true, true, true]}) //cilindropulgar
 		.rotateY(90)
-		.translate([(alto*2), tope/2-6, (tope*0.5)])
+		.translate([(alto*2), x-5, (tope*0.5)])
 
 	),
 	tornillotuerca(4,2.5)[0]//tuerca de tapa
@@ -237,9 +244,10 @@ union(
 	.snap(todo,'y','outside+')
 	.translate([0, 4, (height/2.5)+5]),
 
+
 	tornillotuerca(alto/2,1.75)[0] //tuerca de pulgar
 	.rotateY(90)
-	.translate([(alto*2), tope/2-6, (tope*0.5)])
+	.translate([(alto*2), x-5, (tope*0.5)])
 	/*.snap(palma,'y','outside-')
 	.snap(palma,'x','outside-')
 	.translate([-6.25, -alto, tope*0.5])
@@ -248,13 +256,20 @@ union(
 todo =
 difference(
 	todo,
-	difference(cylinder({r:8, h:alto*1.5, center:[true,true,true]})//tuerca de pulgar
-	.rotateY(90)
-	.translate([(alto*2), tope/2-6, (tope*0.5)]),
-	todosin)
+	//.translate([(alto*2)+8, x-5, (tope*0.5)]),
+		difference(
+			cylinder({r:8, h:alto*1.5, center:[true,true,true]})//tuerca de pulgar
+			.rotateY(90)
+			.translate([(alto*2), x-5, (tope*0.5)]),
+			todosin
+		)
 );
 
 
-return todo;//difference(todo,difference(todo,todosin));
+return todo.subtract(
+cylinder({r:4.5, h:3, center:[true,true,true]})//bajorelieve de pulgar
+.rotateY(90)
+.snap(palma,'x','outside-')
+.translate([-3, x-5, (tope*0.5)]));//difference(todo,difference(todo,todosin));
 
 }
