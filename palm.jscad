@@ -17,17 +17,14 @@ include('node_modules/jscad-utils/jscad-utils-parts.jscad');
 include('node_modules/jscad-utils/jscad-boxes.jscad');
 
 include("tornillotuerca.jscad");
-// TODO:
-// arreglar tapa
-// x del pulgar
 
 var result,xbo;
-var long=70;
-var alto=30;
+var long=60;
+var alto=15;
 var nombre= "GT";
 var pinconector=2;
 var tornilloconector=3;
-var pulgarpresente=0;
+var pulgarpresente=1;
 function main()
 {
 	util.init(CSG);
@@ -218,7 +215,7 @@ if (pulgarpresente) {
 	.scale([1,0.5,1])
 	.snap(palma,'y','outside-')
 	.center('x')
-	.translate([(alto*2)-3, -alto/4, tope/2]) 
+	.translate([(alto*2)-3, -alto/4, tope/2])
 }
 
 	return cubo;
@@ -234,10 +231,16 @@ todo= bajorelieve(height,8,alto)
 
 todo=difference(palma,todo,oppulgar(pulgarpresente,alto,long));
 var todosin=todo;
-vals = calculate(0.1,tope,alto+4,0);
-x = (vals[0]*Math.pow(tope/2,2)) + (vals[1]*tope/2) + vals[2]; //calculo curva ymax
+vals = calculate(0.1,tope,tope/2,0);
+//x = (vals[0]*Math.pow(tope/2,2)) + (vals[1]*tope/2) + vals[2]; //calculo curva ymax
 var s = todo.size();
-console.log("tamanio"+s);
+if (alto>=15) {
+	x=(s.y/2)-10; //offset
+}else {
+	x=(s.y/2)-5; //offset
+}
+
+console.log("tamanio"+s.y);
 todo=
 union(
 	difference(
@@ -247,7 +250,7 @@ union(
 		.translate([0, 0, (height/2.5)]),
 		cylinder({r: 3, h: alto, center: [true, true, true]}) //cilindropulgar
 		.rotateY(90)
-		.translate([(alto*2), x-5, (tope*0.5)])
+		.translate([(alto*2), x, (tope*0.5)])
 
 	),
 	tornillotuerca(4,2.5)[0]//tuerca de tapa
@@ -258,7 +261,7 @@ union(
 
 	tornillotuerca(alto/2,1.75)[0] //tuerca de pulgar
 	.rotateY(90)
-	.translate([(alto*2), x-5, (tope*0.5)])
+	.translate([(alto*2), x, (tope*0.5)])
 	/*.snap(palma,'y','outside-')
 	.snap(palma,'x','outside-')
 	.translate([-6.25, -alto, tope*0.5])
@@ -274,7 +277,7 @@ difference(
 		difference(
 			cylinder({r:8, h:alto*1.5, center:[true,true,true]})//tuerca de pulgar
 			.rotateY(90)
-			.translate([(alto*2), x-5, (tope*0.5)]),
+			.translate([(alto*2), x, (tope*0.5)]),
 			todosin
 		)
 );
@@ -303,7 +306,7 @@ todo=difference(
 	cylinder({r:4.5, h:3, center:[true,true,true]})//bajorelieve de pulgar
 		.rotateY(90)
 		.snap(palma,'x','outside-')
-		.translate([-3, x-5, (tope*0.5)])
+		.translate([-3, x, (tope*0.5)])
 	);
 
 return todo//difference(todo,difference(todo,todosin));
