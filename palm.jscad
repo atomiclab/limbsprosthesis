@@ -20,19 +20,18 @@ include("tornillotuerca.jscad");
 // TODO:
 // arreglar tapa
 // x del pulgar
-// agregar texto "Atomic Lab" y el nombre de usuario
-// posicion slider
+
 var result,xbo;
-var long=90;
-var alto=40;
+var long=70;
+var alto=30;
 var nombre= "GT";
 var pinconector=2;
 var tornilloconector=3;
-var pulgar =1;
+var pulgarpresente=0;
 function main()
 {
 	util.init(CSG);
-	var palma = palmagenerator(alto, long, pulgar,nombre);
+	var palma = palmagenerator(alto, long, pulgarpresente,nombre);
 	//console.log(palma.getfeatures(['volume']));
 	return palma;
 }
@@ -98,13 +97,16 @@ function bajorelieve(height,prof, alto) { //corregir el cilindro
 
 }
 
-function conectores(alto) {
+function conectores(alto, pulgarpresente) {
 	var o = new Array();
-	o.push(cube({size: [alto*4, 2, alto/2], center: [true, true, true]}).translate([0, 2, alto/2.5]));
-	o.push(cube({size: [alto*4, 2, alto/2], center: [true, true, true]}).translate([0, -2, alto/2.5]));
+	o.push(cube({size: [alto*4, 2, alto/2], center: [true, true, true]}).translate([0, 2, alto/2.5])); // velcro inf
+	o.push(cube({size: [alto*4, 2, alto/2], center: [true, true, true]}).translate([0, -2, alto/2.5]));// velcro sup
 	o.push(cylinder({r: 2.75, h: alto*4, center: [true, true, true]}).rotateX(90).rotateZ(90).translate([0, 5, alto-5]));
 
-
+if (!pulgarpresente){
+	o[0]=o[0].scale([1,1,0.75]).rotateX(15);
+	o[1]=o[1].scale([1,1,0.75]).rotateX(15);
+}
 	return union(o);
 }
 function contornos(alto,ancho) {
@@ -130,7 +132,7 @@ function cuerpito(h,ancho) {
 }
 
 
-function palmagenerator(ancho, height,pulgar) {
+function palmagenerator(ancho, height,pulgarpresente,nombre) {
 
 	var cag = CAG.fromPoints([
 		[-1, -1, 0],
@@ -156,14 +158,14 @@ function palmagenerator(ancho, height,pulgar) {
 
 			o.push(circle({r:b, center:true}).translate([ancho,0,0]).subtract(square({size: [alto*4,alto*4]}).center('x')));
 			o.push(circle({r:b, center:true}).translate([-ancho,0,0]).subtract(square({size: [alto*4,alto*4]}).center('x')));
-			if (pulgar) {
+
 				//				if ((h>=height/7)&&(h<=(height*2/3))){
 				if (height*2/3>=50) { //pongo valor de altura fijo a la curvatura pulgar
 					tope = 50;
 				}else {
 					tope=height*2/3;
 				}
-
+if (pulgarpresente) {
 				if ((h>=0.1)&&(h<=(tope))){
 					var vals = calculate(0.1,tope,alto+4,0);
 					x = (vals[0]*Math.pow(h,2)) + (vals[1]*h) + vals[2];
@@ -198,18 +200,26 @@ function palmagenerator(ancho, height,pulgar) {
 	difference(
 		union(thing,slider(alto).mirroredZ()).fillet(3,'z+'),
 		cuerpito(height,ancho),
-		conectores(height),
+		conectores(height,pulgarpresente),
 		contornos(height,ancho)
 
 
 	);
-	function oppulgar() { //operacionpulgar
+	function oppulgar(pulgarpresente,alto,long) { //operacionpulgar
 		var cubo;
 		var th=3;
-
-		cubo = cube({size: [th, ancho, long/2-4], center: [true, false, false]})
-		.snap(palma,'y','outside-')
-		.translate([(alto*2)-th, -alto+th, 4])
+if (pulgarpresente) {
+	cubo = cube({size: [th, ancho, long/2-4], center: [true, false, false]})
+	.snap(palma,'y','outside-')
+	.translate([(alto*2)-th, -alto+th, 4])
+}else {
+	cubo= cylinder({r: long/4, h: alto, center: [true, true, true]})
+	.rotateY(90)
+	.scale([1,0.5,1])
+	.snap(palma,'y','outside-')
+	.center('x')
+	.translate([(alto*2)-3, -alto/4, tope/2]) 
+}
 
 	return cubo;
 }
@@ -222,7 +232,7 @@ todo= bajorelieve(height,8,alto)
 
 
 
-todo=difference(palma,todo,oppulgar());
+todo=difference(palma,todo,oppulgar(pulgarpresente,alto,long));
 var todosin=todo;
 vals = calculate(0.1,tope,alto+4,0);
 x = (vals[0]*Math.pow(tope/2,2)) + (vals[1]*tope/2) + vals[2]; //calculo curva ymax
@@ -234,7 +244,7 @@ union(
 		todo,
 		cylinder({r: 3, h: alto*4, center: [true, true, true]}) //cilindrotapa
 		.rotateX(90)
-		.translate([0, 0, (height/2.5)+5]),
+		.translate([0, 0, (height/2.5)]),
 		cylinder({r: 3, h: alto, center: [true, true, true]}) //cilindropulgar
 		.rotateY(90)
 		.translate([(alto*2), x-5, (tope*0.5)])
@@ -243,7 +253,7 @@ union(
 	tornillotuerca(4,2.5)[0]//tuerca de tapa
 	.rotateX(90)
 	.snap(todo,'y','outside+')
-	.translate([0, 4, (height/2.5)+5]),
+	.translate([0, 4, (height/2.5)]),
 
 
 	tornillotuerca(alto/2,1.75)[0] //tuerca de pulgar
