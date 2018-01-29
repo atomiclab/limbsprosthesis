@@ -16,19 +16,15 @@ include('node_modules/jscad-utils/jscad-boxes.jscad');
 
 include("tornillotuerca.jscad");
 
-
-
-
-
 function main()
 {
 	var lado=0; //0 = der 1 = izq
 	var pulgarpresente=1;
 	var nombre= "GT";
-	var height=40;
-	var ancho=10;
+	var height=60;
+	var ancho=15;
 	util.init(CSG);
-	var palma = palmagenerator(ancho, height, pulgarpresente,nombre);
+	var palma = palmagenerator(ancho, height, pulgarpresente,nombre,lado);
 	//console.log(palma.getfeatures(['volume']));
 	return palma;
 }
@@ -129,7 +125,7 @@ function cuerpito(h,ancho) {
 }
 
 
-function palmagenerator(ancho, height,pulgarpresente,nombre) {
+function palmagenerator(ancho, height,pulgarpresente,nombre,lado) {
 
 	var cag = CAG.fromPoints([
 		[-1, -1, 0],
@@ -255,13 +251,13 @@ if (pulgarpresente) {
 			.translate([(ancho*2), x, (tope*0.5)])
 
 		),
-		tornillotuerca(4,2.5)[0]//tuerca de tapa
+		tornillotuerca(4,2.5,lado)[0]//tuerca de tapa
 		.rotateX(90)
 		.snap(todo,'y','outside+')
 		.translate([0, 4, (height/2.5)]),
 
 
-		tornillotuerca(ancho/2,1.75)[0] //tuerca de pulgar
+		tornillotuerca(ancho/2,1.75,lado)[0] //tuerca de pulgar
 		.rotateY(90)
 		.translate([(ancho*2), x, (tope*0.5)])
 
@@ -276,7 +272,7 @@ if (pulgarpresente) {
 			.rotateX(90)
 			.translate([0, 0, (height/2.5)])
 		),
-		tornillotuerca(4,2.5)[0]//tuerca de tapa
+		tornillotuerca(4,2.5,lado)[0]//tuerca de tapa
 		.rotateX(90)
 		.snap(todo,'y','outside+')
 		.translate([0, 4, (height/2.5)])
@@ -349,7 +345,9 @@ if (pulgarpresente) {
 			.color('red')
 		);
 }
-
+if (lado) {
+todo=todo.mirroredX();
+}
 
 return todo//difference(todo,difference(todo,todosin));
 }
