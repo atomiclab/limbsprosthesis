@@ -1,10 +1,8 @@
-// title      : thumb
+// title      : Palm
 // author     : Gino Tubaro
 // license    : MIT License
 // description: just a thumb
 // file       : palma.jscad
-//!OpenSCAD
-//Hay que parametrizara
 
 include('lodash.js');
 
@@ -18,17 +16,19 @@ include('node_modules/jscad-utils/jscad-boxes.jscad');
 
 include("tornillotuerca.jscad");
 
-var result,xbo;
-var long=60;
-var alto=15;
-var nombre= "GT";
-var pinconector=2;
-var tornilloconector=3;
-var pulgarpresente=1;
+
+
+
+
 function main()
 {
+	var lado=0; //0 = der 1 = izq
+	var pulgarpresente=1;
+	var nombre= "GT";
+	var height=40;
+	var ancho=10;
 	util.init(CSG);
-	var palma = palmagenerator(alto, long, pulgarpresente,nombre);
+	var palma = palmagenerator(ancho, height, pulgarpresente,nombre);
 	//console.log(palma.getfeatures(['volume']));
 	return palma;
 }
@@ -151,10 +151,10 @@ function palmagenerator(ancho, height,pulgarpresente,nombre) {
 			if (coef < 0.01) coef = 0.01;//must not collapse polygon
 			var h = height*t;
 			var y = 0;
-			var b = alto+Math.sin(coef*4);
+			var b = ancho+Math.sin(coef*4);
 
-			o.push(circle({r:b, center:true}).translate([ancho,0,0]).subtract(square({size: [alto*4,alto*4]}).center('x')));
-			o.push(circle({r:b, center:true}).translate([-ancho,0,0]).subtract(square({size: [alto*4,alto*4]}).center('x')));
+			o.push(circle({r:b, center:true}).translate([ancho,0,0]).subtract(square({size: [ancho*4,ancho*4]}).center('x')));
+			o.push(circle({r:b, center:true}).translate([-ancho,0,0]).subtract(square({size: [ancho*4,ancho*4]}).center('x')));
 
 				//				if ((h>=height/7)&&(h<=(height*2/3))){
 				if (height*2/3>=50) { //pongo valor de altura fijo a la curvatura pulgar
@@ -164,13 +164,13 @@ function palmagenerator(ancho, height,pulgarpresente,nombre) {
 				}
 if (pulgarpresente) {
 				if ((h>=0.1)&&(h<=(tope))){
-					var vals = calculate(0.1,tope,alto+4,0);
+					var vals = calculate(0.1,tope,ancho+4,0);
 					x = (vals[0]*Math.pow(h,2)) + (vals[1]*h) + vals[2];
-					o.push(circle({r: x/2, center: true}).translate([alto*2, 8, 0]))
+					o.push(circle({r: x/2, center: true}).translate([ancho*2, 8, 0]))
 				}
 			}
 
-			o.push(square({size: [alto*4,10], center: true}).translate([0, 5, 0]));
+			o.push(square({size: [ancho*4,10], center: true}).translate([0, 5, 0]));
 
 			cag =  hull(o); //.expand(1,CSG.defaultResolution2D)
 
@@ -195,7 +195,7 @@ if (pulgarpresente) {
 
 	var palma=
 	difference(
-		union(thing,slider(alto).mirroredZ()).fillet(3,'z+'),
+		union(thing,slider(ancho).mirroredZ()).fillet(3,'z+'),
 		cuerpito(height,ancho),
 		conectores(height,pulgarpresente),
 		contornos(height,ancho)
@@ -223,91 +223,133 @@ if (pulgarpresente) {
 
 
 //  palma= palma.snap(bajorelieve(height), 'x', 'center-');
-todo= bajorelieve(height,8,alto)
+todo= bajorelieve(height,8,ancho)
 .snap(palma, 'y', 'outside+')
 .translate([0, 3, 0]);
 
 
 
-todo=difference(palma,todo,oppulgar(pulgarpresente,alto,long));
+todo=difference(palma,todo,oppulgar(pulgarpresente,ancho,height));
 var todosin=todo;
 vals = calculate(0.1,tope,tope/2,0);
 //x = (vals[0]*Math.pow(tope/2,2)) + (vals[1]*tope/2) + vals[2]; //calculo curva ymax
 var s = todo.size();
-if (alto>=15) {
+if (ancho>=17) {
 	x=(s.y/2)-10; //offset
 }else {
 	x=(s.y/2)-5; //offset
 }
 
-console.log("tamanio"+s.y);
-todo=
-union(
+
+
+if (pulgarpresente) {
+	todo=
+	union(
+		difference(
+			todo,
+			cylinder({r: 3, h: ancho*4, center: [true, true, true]}) //cilindrotapa
+			.rotateX(90)
+			.translate([0, 0, (height/2.5)]),
+			cylinder({r: 3, h: ancho, center: [true, true, true]}) //cilindropulgar
+			.rotateY(90)
+			.translate([(ancho*2), x, (tope*0.5)])
+
+		),
+		tornillotuerca(4,2.5)[0]//tuerca de tapa
+		.rotateX(90)
+		.snap(todo,'y','outside+')
+		.translate([0, 4, (height/2.5)]),
+
+
+		tornillotuerca(ancho/2,1.75)[0] //tuerca de pulgar
+		.rotateY(90)
+		.translate([(ancho*2), x, (tope*0.5)])
+
+
+	)
+}else {
+	todo=
+	union(
+		difference(
+			todo,
+			cylinder({r: 3, h: ancho*4, center: [true, true, true]}) //cilindrotapa
+			.rotateX(90)
+			.translate([0, 0, (height/2.5)])
+		),
+		tornillotuerca(4,2.5)[0]//tuerca de tapa
+		.rotateX(90)
+		.snap(todo,'y','outside+')
+		.translate([0, 4, (height/2.5)])
+	)
+}
+
+if (pulgarpresente) {
+	todo =
 	difference(
 		todo,
-		cylinder({r: 3, h: alto*4, center: [true, true, true]}) //cilindrotapa
-		.rotateX(90)
-		.translate([0, 0, (height/2.5)]),
-		cylinder({r: 3, h: alto, center: [true, true, true]}) //cilindropulgar
-		.rotateY(90)
-		.translate([(alto*2), x, (tope*0.5)])
-
-	),
-	tornillotuerca(4,2.5)[0]//tuerca de tapa
-	.rotateX(90)
-	.snap(todo,'y','outside+')
-	.translate([0, 4, (height/2.5)]),
-
-
-	tornillotuerca(alto/2,1.75)[0] //tuerca de pulgar
-	.rotateY(90)
-	.translate([(alto*2), x, (tope*0.5)])
-	/*.snap(palma,'y','outside-')
-	.snap(palma,'x','outside-')
-	.translate([-6.25, -alto, tope*0.5])
-*/
-
-
-)
-
-todo =
-difference(
-	todo,
-	//.translate([(alto*2)+8, x-5, (tope*0.5)]),
-		difference(
-			cylinder({r:8, h:alto*1.5, center:[true,true,true]})//tuerca de pulgar
-			.rotateY(90)
-			.translate([(alto*2), x, (tope*0.5)]),
-			todosin
-		)
-);
-todo=difference(
-	todo,
-	util.label("Atomic Lab") //CC
-		.rotateX(90)
-		.scale([1,4,1])
-		//.align(todo, 'xy')
-		//.align(todo, 'xy')
-		.fit([s.x - alto*2-10, s.y - alto, s.z-5],true)
-		.snap(todo, 'y', 'outside+')
-		.translate([0, 2.5, 5])
-		.color('red'),
-
-	util.label(nombre+","+alto+","+long) //Nombre + data
-		.rotateZ(180)
-		.scale([1,1,5])
-		//.align(todo, 'xy')
-		//.align(todo, 'xy')
-		.fit([s.x - alto*2, s.y - alto, s.z-5],true)
-		.center('z')
-		.translate([0, -alto/2, 0])
-		.color('red'),
-
-	cylinder({r:4.5, h:3, center:[true,true,true]})//bajorelieve de pulgar
-		.rotateY(90)
-		.snap(palma,'x','outside-')
-		.translate([-3, x, (tope*0.5)])
+		//.translate([(alto*2)+8, x-5, (tope*0.5)]),
+			difference(
+				cylinder({r:8, h:ancho*1.5, center:[true,true,true]})//tuerca de pulgar
+				.rotateY(90)
+				.translate([(ancho*2), x, (tope*0.5)]),
+				todosin
+			)
 	);
+
+	todo=difference(
+		todo,
+		util.label("Atomic Lab") //CC
+			.rotateX(90)
+			.scale([1,4,1])
+			//.align(todo, 'xy')
+			//.align(todo, 'xy')
+			.fit([s.x - ancho*2-10, s.y - ancho, s.z-5],true)
+			.snap(todo, 'y', 'outside+')
+			.translate([0, 2.5, 5])
+			.color('red'),
+
+		util.label(nombre+","+ancho+","+height) //Nombre + data
+			.rotateZ(180)
+			.scale([1,1,5])
+			//.align(todo, 'xy')
+			//.align(todo, 'xy')
+			.fit([s.x - ancho*2, s.y - ancho, s.z-5],true)
+			.center('z')
+			.translate([0, -ancho/2, 0])
+			.color('red'),
+
+			cylinder({r:4.5, h:3, center:[true,true,true]})//bajorelieve de pulgar
+				.rotateY(90)
+				.snap(palma,'x','outside-')
+				.translate([-3, x, (tope*0.5)])
+
+		);
+
+}else {
+	todo=difference(
+		todo,
+		util.label("Atomic Lab") //CC
+			.rotateX(90)
+			.scale([1,4,1])
+			//.align(todo, 'xy')
+			//.align(todo, 'xy')
+			.fit([s.x - ancho*2-10, s.y - ancho, s.z-5],true)
+			.snap(todo, 'y', 'outside+')
+			.translate([0, 2.5, 5])
+			.color('red'),
+
+		util.label(nombre+","+ancho+","+height) //Nombre + data
+			.rotateZ(180)
+			.scale([1,1,5])
+			//.align(todo, 'xy')
+			//.align(todo, 'xy')
+			.fit([s.x - ancho*2, s.y - ancho, s.z-5],true)
+			.center('z')
+			.translate([0, -ancho/2, 0])
+			.color('red')
+		);
+}
+
 
 return todo//difference(todo,difference(todo,todosin));
 }
