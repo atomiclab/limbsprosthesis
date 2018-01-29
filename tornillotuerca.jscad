@@ -3,8 +3,7 @@
 // var ancho = 5;
 //return  tornillotuerca(alto,ancho)[1];
 //}
-
-  function tornillotuerca(alto,ancho) {
+  function tornillotuerca(alto,ancho,mirror) {
 
 
   	var cag = CAG.fromPoints([
@@ -50,6 +49,10 @@ var tuerca=
       difference(cylinder({r: ancho+2, h: alto, center: [true, true, false]}),
       tornillo
     )
+if (mirror) {
+	tuerca=tuerca.mirroredX();
+	tornillo=tornillo.mirroredX();
+}
      return [tuerca.scale(1.05),tornillo];
 
 }
