@@ -18,10 +18,10 @@ include("tornillotuerca.jscad");
 
 function main()
 {
-	var lado=0; //0 = der 1 = izq
+	var lado=1; //0 = der 1 = izq
 	var pulgarpresente=1;
-	var nombre= "GT";
-	var height=60;
+	var nombre= "Capitan";
+	var height=70;
 	var ancho=15;
 	util.init(CSG);
 	var palma = palmagenerator(ancho, height, pulgarpresente,nombre,lado);
@@ -73,20 +73,20 @@ function slider(alto) { //limpiar
 function bajorelieve(height,prof, alto) { //corregir el cilindro
 
 	var h = hull(
-			square({size: [(alto*2)-3,1], center: true}).translate([0,height-alto,0 ]),//alto*4 - thickness
-			circle({r: alto/2, center: true}).translate([0,10+alto/2,0])
-		);
-		h=h.subtract(square({size: [alto*4,alto]}).translate([-alto*2,height-alto,0]));
-		var tapa = linear_extrude({ height: prof }, h);
-
-/*	var h = hull(
-		square({size: [(alto*4)-10,1], center: true}).translate([0, height-height/4,0 ]),
-		circle({r: alto, center: true}).translate([0,-height*0.003125,0])
+		square({size: [(alto*2)-3,1], center: true}).translate([0,height-alto,0 ]),//alto*4 - thickness
+		circle({r: alto/2, center: true}).translate([0,10+alto/2,0])
 	);
+	h=h.subtract(square({size: [alto*4,alto]}).translate([-alto*2,height-alto,0]));
 	var tapa = linear_extrude({ height: prof }, h);
+
+	/*	var h = hull(
+	square({size: [(alto*4)-10,1], center: true}).translate([0, height-height/4,0 ]),
+	circle({r: alto, center: true}).translate([0,-height*0.003125,0])
+);
+var tapa = linear_extrude({ height: prof }, h);
 */
 
-	return tapa.rotateX(90);
+return tapa.rotateX(90);
 
 }
 
@@ -96,10 +96,10 @@ function conectores(alto, pulgarpresente) {
 	o.push(cube({size: [alto*4, 2, alto/2], center: [true, true, true]}).translate([0, -2, alto/2.5]));// velcro sup
 	o.push(cylinder({r: 2.75, h: alto*4, center: [true, true, true]}).rotateX(90).rotateZ(90).translate([0, 5, alto-5]));
 
-if (!pulgarpresente){
-	o[0]=o[0].scale([1,1,0.75]).rotateX(15);
-	o[1]=o[1].scale([1,1,0.75]).rotateX(15);
-}
+	if (!pulgarpresente){
+		o[0]=o[0].scale([1,1,0.75]).rotateX(15);
+		o[1]=o[1].scale([1,1,0.75]).rotateX(15);
+	}
 	return union(o);
 }
 function contornos(alto,ancho) {
@@ -152,13 +152,13 @@ function palmagenerator(ancho, height,pulgarpresente,nombre,lado) {
 			o.push(circle({r:b, center:true}).translate([ancho,0,0]).subtract(square({size: [ancho*4,ancho*4]}).center('x')));
 			o.push(circle({r:b, center:true}).translate([-ancho,0,0]).subtract(square({size: [ancho*4,ancho*4]}).center('x')));
 
-				//				if ((h>=height/7)&&(h<=(height*2/3))){
-				if (height*2/3>=50) { //pongo valor de altura fijo a la curvatura pulgar
-					tope = 50;
-				}else {
-					tope=height*2/3;
-				}
-if (pulgarpresente) {
+			//				if ((h>=height/7)&&(h<=(height*2/3))){
+			if (height*2/3>=50) { //pongo valor de altura fijo a la curvatura pulgar
+				tope = 50;
+			}else {
+				tope=height*2/3;
+			}
+			if (pulgarpresente) {
 				if ((h>=0.1)&&(h<=(tope))){
 					var vals = calculate(0.1,tope,ancho+4,0);
 					x = (vals[0]*Math.pow(h,2)) + (vals[1]*h) + vals[2];
@@ -201,140 +201,179 @@ if (pulgarpresente) {
 	function oppulgar(pulgarpresente,alto,long) { //operacionpulgar
 		var cubo;
 		var th=3;
-if (pulgarpresente) {
-	cubo = cube({size: [th, ancho, long/2-4], center: [true, false, false]})
-	.snap(palma,'y','outside-')
-	.translate([(alto*2)-th, -alto+th, 4])
-}else {
-	cubo= cylinder({r: long/4, h: alto, center: [true, true, true]})
-	.rotateY(90)
-	.scale([1,0.5,1])
-	.snap(palma,'y','outside-')
-	.center('x')
-	.translate([(alto*2)-3, -alto/4, tope/2])
-}
+		if (pulgarpresente) {
+			cubo = cube({size: [th, ancho, long/2-4], center: [true, false, false]})
+			.snap(palma,'y','outside-')
+			.translate([(alto*2)-th, -alto+th, 4])
+		}else {
+			cubo= cylinder({r: long/4, h: alto, center: [true, true, true]})
+			.rotateY(90)
+			.scale([1,0.5,1])
+			.snap(palma,'y','outside-')
+			.center('x')
+			.translate([(alto*2)-3, -alto/4, tope/2])
+		}
 
-	return cubo;
-}
-
-
-//  palma= palma.snap(bajorelieve(height), 'x', 'center-');
-todo= bajorelieve(height,8,ancho)
-.snap(palma, 'y', 'outside+')
-.translate([0, 3, 0]);
+		return cubo;
+	}
 
 
-
-todo=difference(palma,todo,oppulgar(pulgarpresente,ancho,height));
-var todosin=todo;
-vals = calculate(0.1,tope,tope/2,0);
-//x = (vals[0]*Math.pow(tope/2,2)) + (vals[1]*tope/2) + vals[2]; //calculo curva ymax
-var s = todo.size();
-if (ancho>=17) {
-	x=(s.y/2)-10; //offset
-}else {
-	x=(s.y/2)-5; //offset
-}
+	//  palma= palma.snap(bajorelieve(height), 'x', 'center-');
+	todo= bajorelieve(height,8,ancho)
+	.snap(palma, 'y', 'outside+')
+	.translate([0, 3, 0]);
 
 
 
-if (pulgarpresente) {
-	todo=
-	union(
-		difference(
-			todo,
-			cylinder({r: 3, h: ancho*4, center: [true, true, true]}) //cilindrotapa
+	todo=difference(palma,todo,oppulgar(pulgarpresente,ancho,height));
+	var todosin=todo;
+	vals = calculate(0.1,tope,tope/2,0);
+	//x = (vals[0]*Math.pow(tope/2,2)) + (vals[1]*tope/2) + vals[2]; //calculo curva ymax
+	var s = todo.size();
+	if (ancho>=17) {
+		x=(s.y/2)-10; //offset
+	}else {
+		x=(s.y/2)-5; //offset
+	}
+
+
+
+	if (pulgarpresente) {
+		todo=
+		union(
+			difference(
+				todo,
+				cylinder({r: 3, h: ancho*4, center: [true, true, true]}) //cilindrotapa
+				.rotateX(90)
+				.translate([0, 0, (height/2.5)]),
+				cylinder({r: 3, h: ancho, center: [true, true, true]}) //cilindropulgar
+				.rotateY(90)
+				.translate([(ancho*2), x, (tope*0.5)])
+
+			),
+			tornillotuerca(4,2.5,lado)[0]//tuerca de tapa
 			.rotateX(90)
-			.translate([0, 0, (height/2.5)]),
-			cylinder({r: 3, h: ancho, center: [true, true, true]}) //cilindropulgar
+			.snap(todo,'y','outside+')
+			.translate([0, 4, (height/2.5)]),
+
+
+			tornillotuerca(ancho/2,1.75,lado)[0] //tuerca de pulgar
 			.rotateY(90)
 			.translate([(ancho*2), x, (tope*0.5)])
 
-		),
-		tornillotuerca(4,2.5,lado)[0]//tuerca de tapa
-		.rotateX(90)
-		.snap(todo,'y','outside+')
-		.translate([0, 4, (height/2.5)]),
 
+		)
+	}else {
+		todo=
+		union(
+			difference(
+				todo,
+				cylinder({r: 3, h: ancho*4, center: [true, true, true]}) //cilindrotapa
+				.rotateX(90)
+				.translate([0, 0, (height/2.5)])
+			),
+			tornillotuerca(4,2.5,lado)[0]//tuerca de tapa
+			.rotateX(90)
+			.snap(todo,'y','outside+')
+			.translate([0, 4, (height/2.5)])
+		)
+	}
 
-		tornillotuerca(ancho/2,1.75,lado)[0] //tuerca de pulgar
-		.rotateY(90)
-		.translate([(ancho*2), x, (tope*0.5)])
-
-
-	)
-}else {
-	todo=
-	union(
+	if (pulgarpresente) {
+		todo =
 		difference(
 			todo,
-			cylinder({r: 3, h: ancho*4, center: [true, true, true]}) //cilindrotapa
-			.rotateX(90)
-			.translate([0, 0, (height/2.5)])
-		),
-		tornillotuerca(4,2.5,lado)[0]//tuerca de tapa
-		.rotateX(90)
-		.snap(todo,'y','outside+')
-		.translate([0, 4, (height/2.5)])
-	)
-}
-
-if (pulgarpresente) {
-	todo =
-	difference(
-		todo,
-		//.translate([(alto*2)+8, x-5, (tope*0.5)]),
+			//.translate([(alto*2)+8, x-5, (tope*0.5)]),
 			difference(
 				cylinder({r:8, h:ancho*1.5, center:[true,true,true]})//tuerca de pulgar
 				.rotateY(90)
 				.translate([(ancho*2), x, (tope*0.5)]),
 				todosin
 			)
-	);
+		);
+		if (lado) { //mirroreo texto
+			todo=difference(
+				todo,
+				util.label("Atomic Lab") //CC
+				.rotateX(90)
+				.scale([1,4,1])
+				.fit([s.x - ancho*2-10, s.y - ancho, s.z-5],true)
+				.snap(todo, 'y', 'outside+')
+				.translate([0, 2.5, 5])
+				.mirroredX(),
 
-	todo=difference(
-		todo,
-		util.label("Atomic Lab") //CC
-			.rotateX(90)
-			.scale([1,4,1])
-			//.align(todo, 'xy')
-			//.align(todo, 'xy')
-			.fit([s.x - ancho*2-10, s.y - ancho, s.z-5],true)
-			.snap(todo, 'y', 'outside+')
-			.translate([0, 2.5, 5])
-			.color('red'),
+				util.label(nombre+","+ancho+","+height) //Nombre + data
+				.rotateZ(180)
+				.scale([1,1,5])
+				.fit([s.x - ancho*2, s.y - ancho, s.z-5],true)
+				.center('z')
+				.translate([0, -ancho/2, 0])
+				.mirroredX(),
 
-		util.label(nombre+","+ancho+","+height) //Nombre + data
-			.rotateZ(180)
-			.scale([1,1,5])
-			//.align(todo, 'xy')
-			//.align(todo, 'xy')
-			.fit([s.x - ancho*2, s.y - ancho, s.z-5],true)
-			.center('z')
-			.translate([0, -ancho/2, 0])
-			.color('red'),
-
-			cylinder({r:4.5, h:3, center:[true,true,true]})//bajorelieve de pulgar
+				cylinder({r:4.5, h:3, center:[true,true,true]})//bajorelieve de pulgar
 				.rotateY(90)
 				.snap(palma,'x','outside-')
 				.translate([-3, x, (tope*0.5)])
 
-		);
+			);
+		}else {
+			todo=difference(
+				todo,
+				util.label("Atomic Lab") //CC
+				.rotateX(90)
+				.scale([1,4,1])
+				.fit([s.x - ancho*2-10, s.y - ancho, s.z-5],true)
+				.snap(todo, 'y', 'outside+')
+				.translate([0, 2.5, 5]),
 
-}else {
-	todo=difference(
-		todo,
-		util.label("Atomic Lab") //CC
+				util.label(nombre+","+ancho+","+height) //Nombre + data
+				.rotateZ(180)
+				.scale([1,1,5])
+				.fit([s.x - ancho*2, s.y - ancho, s.z-5],true)
+				.center('z')
+				.translate([0, -ancho/2, 0]),
+
+				cylinder({r:4.5, h:3, center:[true,true,true]})//bajorelieve de pulgar
+				.rotateY(90)
+				.snap(palma,'x','outside-')
+				.translate([-3, x, (tope*0.5)])
+
+			);
+		}
+
+
+	}else {
+
+	if (lado) {
+		todo=difference(
+			todo,
+			util.label("Atomic Lab") //CC
 			.rotateX(90)
 			.scale([1,4,1])
-			//.align(todo, 'xy')
-			//.align(todo, 'xy')
 			.fit([s.x - ancho*2-10, s.y - ancho, s.z-5],true)
 			.snap(todo, 'y', 'outside+')
 			.translate([0, 2.5, 5])
-			.color('red'),
+			.mirroredX(),
 
-		util.label(nombre+","+ancho+","+height) //Nombre + data
+			util.label(nombre+","+ancho+","+height) //Nombre + data
+			.rotateZ(180)
+			.scale([1,1,5])
+			.fit([s.x - ancho*2, s.y - ancho, s.z-5],true)
+			.center('z')
+			.translate([0, -ancho/2, 0])
+			.mirroredX()
+		);
+	}else {
+		todo=difference(
+			todo,
+			util.label("Atomic Lab") //CC
+			.rotateX(90)
+			.scale([1,4,1])
+			.fit([s.x - ancho*2-10, s.y - ancho, s.z-5],true)
+			.snap(todo, 'y', 'outside+')
+			.translate([0, 2.5, 5]),
+
+			util.label(nombre+","+ancho+","+height) //Nombre + data
 			.rotateZ(180)
 			.scale([1,1,5])
 			//.align(todo, 'xy')
@@ -342,12 +381,17 @@ if (pulgarpresente) {
 			.fit([s.x - ancho*2, s.y - ancho, s.z-5],true)
 			.center('z')
 			.translate([0, -ancho/2, 0])
-			.color('red')
 		);
-}
-if (lado) {
-todo=todo.mirroredX();
-}
+	}
 
-return todo//difference(todo,difference(todo,todosin));
+	}
+
+
+
+
+	if (lado) {
+		todo=todo.mirroredX();
+	}
+
+	return todo//difference(todo,difference(todo,todosin));
 }
