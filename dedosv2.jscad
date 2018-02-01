@@ -82,7 +82,7 @@ function fingers(largo,alto,r,anchodedos) {
       }
 
     }
-
+/*
     function main() {
 
       var largo=6;
@@ -93,4 +93,4 @@ function fingers(largo,alto,r,anchodedos) {
       //return fingers(largo,alto,r);
     return  fingers(6,alto,r,anchodedos)
 
-    }
+  }*/
