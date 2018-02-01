@@ -24,7 +24,7 @@ function CuatroDedos(largodedos,alto,anchodedo){ //Cuatro dedos
     l = largodedos+abs((sin(i*50))); //curva dedos
     w.push(translate([ 0, 0, i*separaciondedos], dedo(l,anchodedo))); //uno arriba del otro separado
     if (i <=2){ // cubos en el medio
-      w.push(cube({size:[separaciondedos,5,separaciondedos], center:[true,true,false], round:true}).translate([5,0,(i*separaciondedos+3)]).rotateZ(25));
+      w.push(cube({size:[separaciondedos,5,separaciondedos+3], center:[true,true,false], round:true}).translate([5,0,(i*separaciondedos)]).rotateZ(25));
     }
   }
 
@@ -62,9 +62,9 @@ function fingers(largo,alto,r,anchodedos) {
     difference(
       union(CuatroDedos(largo,alto,anchodedos)),
       union(
-        cylinder({d: 30, h: anchodedos/4}), // cilindro bajo
-        cylinder({d: 20, h: alto-anchodedos-anchodedos}).translate([3,0,anchodedos*0.75]), //cilindro pasador
-        cylinder({d: 30, h: anchodedos}).translate([0,0,alto-anchodedos]), //cilindro superior
+        cylinder({d: 30, h: anchodedos/4, center: [true, true, false]}), // cilindro bajo
+        cylinder({d: 30, h: anchodedos/4, center: [true, true, false ]}).translate([0,0,3/4*alto+anchodedos*3/4]), //cilindro superior
+        cylinder({d: 20, h: 3/4*alto-anchodedos*.5, center: [true, true, false]}).translate([4,0,anchodedos*0.75]), //cilindro pasador
         cylinder({d: 45, h: alto, fn:32}).translate([-13,0,0])
       ).translate([-11,0,0]), //desfasaje
       cylinder({d:3, h:alto}).translate([1,-2,0]),
@@ -91,14 +91,6 @@ function fingers(largo,alto,r,anchodedos) {
       var anchodedos=6;
       util.init(CSG);
       //return fingers(largo,alto,r);
-    return  fingers(6,alto,r,anchodedos);
-
-
-
+    return  fingers(6,alto,r,anchodedos)
 
     }
-
-
-
-
-    //
