@@ -10,11 +10,11 @@ include("node_modules/jscad-utils/jscad-utils-color.jscad");
 
 include('node_modules/jscad-utils/jscad-utils-parts.jscad');
 include('node_modules/jscad-utils/jscad-boxes.jscad');
-
+/*
 function main(params) {
 	util.init(CSG);
 	return mholder(10);
-}
+}*/
 
 function mholder(alto) { //limpiar
 
