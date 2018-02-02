@@ -84,6 +84,10 @@ function mholder(alto) { //limpiar
 	);
 
 
-	return  todo.translate([0, 0, -9]);
+	return  todo
+		.fillet(2, 'z-')
+		.translate([0, 0, -9])
+		.subtract(i.translate([0, 0, -10]))
+		;
 
 }
