@@ -4,9 +4,7 @@
 // description: just a thumb
 // file       : palma.jscad
 
-include('lodash.js');
-
-include("formulas.jscad");
+/*include('lodash.js');
 
 include("node_modules/jscad-utils/jscad-utils.jscad");
 include("node_modules/jscad-utils/jscad-utils-color.jscad");
@@ -15,6 +13,7 @@ include('node_modules/jscad-utils/jscad-utils-parts.jscad');
 include('node_modules/jscad-utils/jscad-boxes.jscad');
 
 include("tornillotuerca.jscad");
+include("formulas.jscad");
 
 function main()
 {
@@ -27,7 +26,7 @@ function main()
 	var palma = palmagenerator(ancho, height, pulgarpresente,nombre,lado);
 	//console.log(palma.getfeatures(['volume']));
 	return palma;
-}
+}*/
 
 
 function slider(alto) { //limpiar
@@ -291,7 +290,7 @@ function palmagenerator(ancho, height,pulgarpresente,nombre,lado) {
 				todosin
 			)
 		);
-		if (lado) { //mirroreo texto
+		if (!lado) { //mirroreo texto
 			todo=difference(
 				todo,
 				util.label("Atomic Lab") //CC
@@ -344,7 +343,7 @@ function palmagenerator(ancho, height,pulgarpresente,nombre,lado) {
 
 	}else {
 
-	if (lado) {
+	if (!lado) {
 		todo=difference(
 			todo,
 			util.label("Atomic Lab") //CC
@@ -389,9 +388,9 @@ function palmagenerator(ancho, height,pulgarpresente,nombre,lado) {
 
 
 
-	if (lado) {
+	if (!lado) {
 		todo=todo.mirroredX();
 	}
 
-	return todo//difference(todo,difference(todo,todosin));
+	return todo.snap(cube({size: 1, center: [false,false,false]}),'z','inside-')//apoyo sobre cama
 }
