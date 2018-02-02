@@ -89,7 +89,7 @@ return tapa.rotateX(90);
 
 }
 
-function conectores(alto, pulgarpresente) {
+function conectoresp(alto, pulgarpresente) {
 	var o = new Array();
 	o.push(cube({size: [alto*4, 2, alto/2], center: [true, true, true]}).translate([0, 2, alto/2.5])); // velcro inf
 	o.push(cube({size: [alto*4, 2, alto/2], center: [true, true, true]}).translate([0, -2, alto/2.5]));// velcro sup
@@ -192,7 +192,7 @@ function palmagenerator(ancho, height,pulgarpresente,nombre,lado) {
 	difference(
 		union(thing,slider(ancho).mirroredZ()).fillet(3,'z+'),
 		cuerpito(height,ancho),
-		conectores(height,pulgarpresente),
+		conectoresp(height,pulgarpresente),
 		contornos(height,ancho)
 
 
