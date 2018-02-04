@@ -16,6 +16,8 @@ include ("bridev2.jscad");
 
 include ("dedosv2.jscad");
 
+include ("upperarm.jscad");
+
 /*include ("esqueleto.jscad");
 include ("conectores.jscad");
 include ("barras.jscad");
@@ -93,13 +95,18 @@ function main(params) {
 
   /* Dedos */
   var largo=6;
-  var anchodedos=6;
+  var anchodedos=8;
 
-  fingers=fingers(largo,height,lado,anchodedos)
+  fingers=fingers(largo,ancho*5,lado,anchodedos)
       .rotateY(90)
       .translate([-ancho*2-1, 0, -15])
+  //////////////////////
 
-  return union(palma,mholders,x2s,fingers);
+  /* Upper Arm */
+  ua= UpperArm(params.x,height+height/2,pulgarpresente,lado)
+      .translate([0, -1, height+4]);
+
+  return union(palma,mholders,x2s,fingers,ua);
 
 
 }
