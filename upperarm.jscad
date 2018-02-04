@@ -18,7 +18,7 @@
 //INCHS - MM -> util.INCH(x)
 
 //function UpperArm(xtop,x,ypalm,zpalm) {
-
+/*
 include('lodash.js');
 
 include("node_modules/jscad-utils/jscad-utils.jscad");
@@ -38,7 +38,7 @@ function main(params) {
   lado=0;
   return UpperArm(ancho,alto,pulgarpresente,lado)
 }
-
+*/
 function UpperArm(anchomuneca,alto,pulgarpresente,lado) {
 
   var grosor = 3;
