@@ -126,6 +126,7 @@ function cuerpito(h,ancho) {
 
 function palmagenerator(ancho, height,pulgarpresente,nombre,lado) {
 
+	var thumbposition= new Array();
 	var cag = CAG.fromPoints([
 		[-1, -1, 0],
 		[1, -1, 0],
@@ -290,6 +291,9 @@ function palmagenerator(ancho, height,pulgarpresente,nombre,lado) {
 				todosin
 			)
 		);
+		thumbposition[0]=ancho*2;
+		thumbposition[1]=x;
+		thumbposition[2]=tope*0.5;
 		if (!lado) { //mirroreo texto
 			todo=difference(
 				todo,
@@ -392,5 +396,5 @@ function palmagenerator(ancho, height,pulgarpresente,nombre,lado) {
 		todo=todo.mirroredX();
 	}
 
-	return todo.snap(cube({size: 1, center: [false,false,false]}),'z','inside-')//apoyo sobre cama
+	return [todo.snap(cube({size: 1, center: [false,false,false]}),'z','inside-'),thumbposition[0],thumbposition[1],thumbposition[2]]//apoyo sobre cama
 }

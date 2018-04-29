@@ -3,7 +3,7 @@
 // license    : MIT License
 // description: Conector inferior x1 (bottom)
 // file       : xbottom.jscad
-
+/*
 include('lodash.js');
 
 include("node_modules/jscad-utils/jscad-utils.jscad");
@@ -14,11 +14,13 @@ include('node_modules/jscad-utils/jscad-boxes.jscad');
 
 
 include ("conectores.jscad");
+include ("formulas.jscad");*/
 
-function x2(ancho, alt) {
 
-ancho=40;
-alt=6;
+function x2(ancho, alt,lado) {
+
+  //ancho=3/4*40-6*.5;
+  alt=ancho/10;
   var array = conectores(ancho);
 
   var arco =
@@ -29,19 +31,22 @@ alt=6;
     //int(ancho-3).translate([0, 0, 1.5])
   );
   var pins=pin(8,2.5,4,1,10)
-	.rotateY(17)
+  .rotateY(17)
   .rotateZ(90);
   //.translate([1.5, -8, 1]);
-arco=arco
-	.rotateY(270)
-	.snap(cube(1).translate([0, 0, -1]),'z','outside-');
-  return   union(arco,
-    //.translate([ancho/2, 0, 0]),
+  arco=arco
+  .rotateY(270)
+  .snap(cube(1).translate([0, 0, -1]),'z','outside-');
+  arco=union(arco,
     pins
-		.snap(arco,'x','outside-')
-		.translate([0, -9, 5])
+    .snap(arco,'x','outside-')
+    .translate([0, -9, 5])
+  )
+  if (!lado) {
+    arco=arco.mirroredX();
+  }
 
-	)
+  return arco
 
 }
 
@@ -49,7 +54,7 @@ arco=arco
 
 function ext(dist,alt) {
 
-console.log(dist);
+  //console.log(dist);
   var cag = CAG.fromPoints([
     [-1, -1, 0],
     [1, -1, 0],
@@ -116,51 +121,51 @@ console.log(dist);
   return thing;
 
 }
-
+/*
 function calculate(x1,x2,y,yaux)
 {
-  sgnb=" +"; sgnc=" +";
-  a = x1; //x1
-  a=a*a;
-  b = x1; //x1
-  c = 1;
-  d = yaux; //y1
+sgnb=" +"; sgnc=" +";
+a = x1; //x1
+a=a*a;
+b = x1; //x1
+c = 1;
+d = yaux; //y1
 
-  e = ((x1+x2)/2);//x2
-  e=e*e;
-  f = ((x1+x2)/2); //x2
-  g = 1;
-  h = y; //y2
+e = ((x1+x2)/2);//x2
+e=e*e;
+f = ((x1+x2)/2); //x2
+g = 1;
+h = y; //y2
 
-  i = x2; //x3
-  i=i*i;
-  j = x2; //x3
-  k = 1;
-  l = yaux; //y3
+i = x2; //x3
+i=i*i;
+j = x2; //x3
+k = 1;
+l = yaux; //y3
 
-  <!--Diferenciales -->
-  delta = (a*f*k)+(b*g*i)+(c*e*j)-(c*f*i)-(a*g*j)-(b*e*k);
-  //document.output.x.value = delta;
+<!--Diferenciales -->
+delta = (a*f*k)+(b*g*i)+(c*e*j)-(c*f*i)-(a*g*j)-(b*e*k);
+//document.output.x.value = delta;
 
-  <!--Valor de A-->
-  xnum = eval((d*f*k)+(b*g*l)+(c*h*j)-(c*f*l)-(d*g*j)-(b*h*k));
-  xans =eval(xnum/delta);
+<!--Valor de A-->
+xnum = eval((d*f*k)+(b*g*l)+(c*h*j)-(c*f*l)-(d*g*j)-(b*h*k));
+xans =eval(xnum/delta);
 
-  <!--Valor de B -->
-  ynum = eval((a*h*k)+(d*g*i)+(c*e*l)-(c*h*i)-(a*g*l)-(d*e*k));
-  yans =eval(ynum/delta);
+<!--Valor de B -->
+ynum = eval((a*h*k)+(d*g*i)+(c*e*l)-(c*h*i)-(a*g*l)-(d*e*k));
+yans =eval(ynum/delta);
 
-  <!--Valor de C-->
-  znum = eval((a*f*l)+(b*h*i)+(d*e*j)-(d*f*i)-(a*h*j)-(b*e*l));
-  zans =eval(znum/delta);
-  if (yans<0) {sgnb=" "};
-  if (zans<0) {sgnc=" "};
-  xans = xans;
-  yans = sgnb + yans;
+<!--Valor de C-->
+znum = eval((a*f*l)+(b*h*i)+(d*e*j)-(d*f*i)-(a*h*j)-(b*e*l));
+zans =eval(znum/delta);
+if (yans<0) {sgnb=" "};
+if (zans<0) {sgnc=" "};
+xans = xans;
+yans = sgnb + yans;
 
-  return [xans,yans,zans];
+return [xans,yans,zans];
 }
-
+*/
 
 function conectores(alto) {
 
@@ -193,8 +198,8 @@ function conectores(alto) {
   )
   return [bajo,superior];
 }
-
+/*
 function main(){
-  util.init(CSG);
-  return x2(10,2);
-};
+util.init(CSG);
+return x2(40,2);
+};*/
